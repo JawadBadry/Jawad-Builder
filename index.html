@@ -28,7 +28,15 @@
       --text-muted: #64748b;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; transition: background 0.2s, color 0.2s; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: system-ui, -apple-system, sans-serif; 
+      transition: background 0.2s, color 0.2s; 
+      -webkit-user-select: text !important; /* السماح بالتحديد والنسخ في نظام الأندرويد */
+      user-select: text !important;
+    }
     
     html, body { 
       width: 100%; 
@@ -40,7 +48,6 @@
       overflow: hidden; 
     }
 
-    /* تثبيت حاوي التطبيق الأساسي في الشاشة بالكامل بناءً على ارتفاع الفريم الحقيقي */
     #app-container {
       position: fixed;
       top: 0;
@@ -48,13 +55,12 @@
       left: 0;
       right: 0;
       width: 100%;
-      height: 100%; /* يتعدل تلقائياً بواسطة JavaScript */
+      height: 100%;
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
 
-    /* الهيدر العلوي */
     header { 
       display: flex; 
       flex-direction: column;
@@ -88,7 +94,7 @@
       display: flex; 
       align-items: center; 
       gap: 6px; 
-    }
+    } 
     
     .btn-tool { 
       background: var(--bg-input); 
@@ -114,7 +120,6 @@
       white-space: nowrap; 
     }
 
-    /* شريط التنقل */
     .view-switcher { 
       display: flex; 
       background: var(--bg-input); 
@@ -144,7 +149,6 @@
       color: #fff; 
     }
 
-    /* المحتوى الأوسط */
     main { 
       flex: 1; 
       position: relative; 
@@ -167,7 +171,6 @@
       display: flex; 
     }
 
-    /* لوحة الشات */
     .chat-panel { 
       padding: 10px 12px; 
       gap: 8px; 
@@ -177,7 +180,16 @@
       flex-direction: column;
     }
 
+    /* حاوي حقل كلمة السر مع زر اللصق السريع */
+    .secret-container {
+      display: flex;
+      gap: 6px;
+      width: 100%;
+      flex-shrink: 0;
+    }
+
     .secret-input { 
+      flex: 1;
       padding: 9px; 
       background: var(--bg-input); 
       border: 1px solid var(--border-color); 
@@ -185,8 +197,20 @@
       border-radius: 8px; 
       outline: none; 
       font-size: 12px; 
-      flex-shrink: 0;
+      -webkit-text-security: disc; /* تمويه النص بنقاط الأمان مع حفظ إمكانية النسخ/اللصق */
     } 
+
+    .btn-paste {
+      background: var(--bg-input);
+      color: var(--accent-color);
+      border: 1px solid var(--border-color);
+      padding: 0 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      white-space: nowrap;
+    }
     
     .chat-box { 
       flex: 1; 
@@ -227,7 +251,6 @@
       align-self: flex-start; 
     }
 
-    /* منطقة الإدخال السفلى المضمونة */
     .input-area { 
       display: flex; 
       gap: 8px; 
@@ -259,7 +282,6 @@
       white-space: nowrap;
     }
 
-    /* لوحة المعاينة والكود */
     .preview-frame { 
       width: 100%; 
       height: 100%; 
@@ -304,10 +326,12 @@
 
     <main>
       <div id="chatView" class="view-panel chat-panel active">
-        <input type="password" id="secretKey" class="secret-input" placeholder="ضع كلمة السر هنا...">
+        <div class="secret-container">
+          <input type="text" id="secretKey" class="secret-input" placeholder="ضع مفتاح كلمة السر هنا..." autocomplete="off">
+        </div>
         
         <div class="chat-box" id="chatBox">
-          <div class="msg ai-msg" id="welcomeMsg">مرحباً جواد! اكتب فكرتك هنا وسأقوم ببناء موقعك فوراً.</div>
+          <div class="msg ai-msg" id="welcomeMsg">مرحباً جواد! اكتب فكرتك هنا وسأقوم ببناء موقعك فوراً عبر Jawad Builder.</div>
         </div>
         
         <div class="input-area">
@@ -327,7 +351,6 @@
   </div>
 
   <script>
-    // برمجة ضبط الارتفاع الحقيقي للجوال لمنع قطع الأسفل أو الأعلى
     function setRealHeight() {
       const vh = window.innerHeight;
       document.getElementById('app-container').style.height = `${vh}px`;
@@ -335,6 +358,19 @@
     window.addEventListener('resize', setRealHeight);
     window.addEventListener('orientationchange', setRealHeight);
     setRealHeight();
+
+    // دالة اللصق المباشر من حافظة الجهاز بنقرة واحدة
+    async function pasteFromClipboard() {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          document.getElementById('secretKey').value = text;
+        }
+      } catch (err) {
+        document.getElementById('secretKey').focus();
+        document.execCommand('paste');
+      }
+    }
 
     const defaultHTML = `<!DOCTYPE html>
 <html lang="ar">
@@ -349,8 +385,8 @@
 </head>
 <body>
   <h1>Jawad Builder 🚀</h1>
-  <p>التطبيق جاهز وسلس جداً! ضع كلمة السر واطلب أي موقع تريد إنشاءه.</p>
-  <button onclick="alert('كل شيء يعمل بسرعة وسلاسة!')">تجربة الموقع</button>
+  <p>التطبيق يعمل بربط Jawad Builder المباشر مع 1500 طلب يومياً!</p>
+  <button onclick="alert('سريع ومجاني بدون حدود معقدة!')">تجربة الموقع</button>
 </body>
 </html>`;
 
@@ -399,8 +435,9 @@
       document.getElementById('chatTxt').innerText = isEn ? 'Chat' : 'الشات';
       document.getElementById('prevTxt').innerText = isEn ? 'Preview' : 'المعاينة';
       document.getElementById('codeTxt').innerText = isEn ? 'Code' : 'الكود';
-      document.getElementById('secretKey').placeholder = isEn ? 'Enter API Key...' : 'ضع كلمة السر هنا...';
-      document.getElementById('welcomeMsg').innerText = isEn ? 'Hello Jawad! Type your idea here.' : 'مرحباً جواد! اكتب فكرتك هنا وسأقوم ببناء موقعك فوراً.';
+      document.getElementById('secretKey').placeholder = isEn ? 'Enter API Key...' : 'ضع مفتاح كلمة السر هنا...';
+      document.getElementById('pasteTxt').innerText = isEn ? 'Paste' : 'لصق';
+      document.getElementById('welcomeMsg').innerText = isEn ? 'Hello Jawad! Type your idea here.' : 'مرحباً جواد! اكتب فكرتك هنا وسأقوم ببناء موقعك فوراً عبر Jawad Builder.';
       document.getElementById('userInput').placeholder = isEn ? 'Ask to build a website...' : 'اطلب تصميم موقع...';
       document.getElementById('sendBtn').innerText = isEn ? 'Send' : 'إرسال';
 
@@ -421,40 +458,35 @@
       
       if (!prompt) return;
       if (!secretKey) {
-        alert(appLang === 'en' ? 'Please enter your API Key first!' : 'يرجى إدخال كلمة السر أولاً!');
+        alert(appLang === 'en' ? 'Please enter your API Key first!' : 'يرجى إدخال مفتاح كلمة السر أولاً!');
         return;
       }
 
       addMessage(prompt, 'user-msg');
       input.value = '';
-      addMessage(appLang === 'en' ? 'Generating website code...' : 'جاري بناء وتوليد كود الموقع...', 'ai-msg');
+      addMessage(appLang === 'en' ? 'Generating website code...' : 'جاري توليد كود الموقع...', 'ai-msg');
 
       try {
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${secretKey}`;
+
+        const response = await fetch(url, {
           method: 'POST',
           headers: {
-            'Authorization': 'Bearer ' + secretKey,
-            'HTTP-Referer': window.location.href,
-            'X-Title': 'Jawad Builder',
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            model: 'google/gemini-2.5-flash',
-            max_tokens: 4000,
-            messages: [
-              {
-                role: 'system',
-                content: 'You are an expert web developer. Generate a COMPLETE, FULLY WORKING single-file HTML document (including inline CSS and JavaScript). NEVER truncate or cut off the code. Ensure all HTML tags are properly closed at the end (e.g. </html>). You may use Tailwind CSS via CDN if helpful. Return ONLY raw HTML code starting with <!DOCTYPE html> without markdown blocks.'
-              },
-              { role: 'user', content: prompt }
-            ]
+            contents: [{
+              parts: [{
+                text: `You are an expert web developer. Generate a COMPLETE, FULLY WORKING single-file HTML document (including inline CSS and JavaScript) for this request: "${prompt}". NEVER truncate or cut off the code. Ensure all HTML tags are properly closed. Return ONLY raw HTML code starting with <!DOCTYPE html> without markdown blocks.`
+              }]
+            }]
           })
         });
 
         const data = await response.json();
 
-        if (response.ok && data.choices && data.choices[0]) {
-          let generatedCode = data.choices[0].message.content;
+        if (response.ok && data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+          let generatedCode = data.candidates[0].content.parts[0].text;
           generatedCode = generatedCode.replace(/^```html/gi, '').replace(/^```/gi, '').replace(/```$/gi, '').trim();
 
           document.getElementById('codeArea').value = generatedCode;
