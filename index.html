@@ -31,27 +31,37 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; transition: background 0.2s, color 0.2s; }
     
     html, body { 
-      height: 100%; 
-      height: 100svh; /* لضبط الارتفاع الدقيق في متصفحات الجوال */
       width: 100%; 
+      height: 100%;
+      margin: 0;
+      padding: 0;
       background: var(--bg-main); 
       color: var(--text-main); 
       overflow: hidden; 
     }
 
-    body { 
-      display: flex; 
-      flex-direction: column; 
+    /* تثبيت حاوي التطبيق الأساسي في الشاشة بالكامل بناءً على ارتفاع الفريم الحقيقي */
+    #app-container {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 100%; /* يتعدل تلقائياً بواسطة JavaScript */
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
-    /* الهيدر العلوي المحسن بالكامل */
+    /* الهيدر العلوي */
     header { 
       display: flex; 
       flex-direction: column;
-      padding: 12px;
+      padding: 10px 12px;
       background: var(--bg-panel); 
       border-bottom: 1px solid var(--border-color); 
-      gap: 10px; 
+      gap: 8px; 
       z-index: 99;
       flex-shrink: 0;
     }
@@ -61,7 +71,7 @@
       justify-content: space-between;
       align-items: center;
       width: 100%;
-      direction: ltr; /* توحيد الهيكل الداخلي للهيدر لمنع تداخل الشعار والأزرار */
+      direction: ltr;
     }
 
     .logo { 
@@ -104,7 +114,7 @@
       white-space: nowrap; 
     }
 
-    /* شريط أزرار التنقل */
+    /* شريط التنقل */
     .view-switcher { 
       display: flex; 
       background: var(--bg-input); 
@@ -120,7 +130,7 @@
       background: transparent; 
       color: var(--text-muted); 
       border: none; 
-      padding: 8px 4px; 
+      padding: 7px 4px; 
       border-radius: 6px; 
       font-size: 12px; 
       font-weight: 600; 
@@ -134,7 +144,7 @@
       color: #fff; 
     }
 
-    /* المنطقة الرئيسية للعرض */
+    /* المحتوى الأوسط */
     main { 
       flex: 1; 
       position: relative; 
@@ -142,7 +152,6 @@
       overflow: hidden; 
     }
 
-    /* لوحات العرض */
     .view-panel { 
       position: absolute; 
       top: 0; 
@@ -160,14 +169,16 @@
 
     /* لوحة الشات */
     .chat-panel { 
-      padding: 12px; 
-      gap: 10px; 
+      padding: 10px 12px; 
+      gap: 8px; 
       height: 100%; 
       background: var(--bg-panel); 
+      display: flex;
+      flex-direction: column;
     }
 
     .secret-input { 
-      padding: 10px; 
+      padding: 9px; 
       background: var(--bg-input); 
       border: 1px solid var(--border-color); 
       color: var(--text-main); 
@@ -187,7 +198,7 @@
     }
 
     .msg { 
-      padding: 10px 14px; 
+      padding: 9px 12px; 
       border-radius: 10px; 
       font-size: 13px; 
       max-width: 88%; 
@@ -216,18 +227,18 @@
       align-self: flex-start; 
     }
 
-    /* حقل الإدخال السفلي المحمي من أشرطة المتصفح والتطبيق */
+    /* منطقة الإدخال السفلى المضمونة */
     .input-area { 
       display: flex; 
       gap: 8px; 
       padding-top: 4px;
-      padding-bottom: 12px;
+      padding-bottom: 6px;
       flex-shrink: 0;
     }
 
     .prompt-input { 
       flex: 1; 
-      padding: 12px; 
+      padding: 10px 12px; 
       background: var(--bg-input); 
       border: 1px solid var(--border-color); 
       color: var(--text-main); 
@@ -262,7 +273,7 @@
       background: var(--bg-main); 
       color: var(--text-main); 
       border: none; 
-      padding: 14px; 
+      padding: 12px; 
       font-family: monospace; 
       resize: none; 
       outline: none; 
@@ -273,47 +284,58 @@
 </head>
 <body>
 
-  <header>
-    <div class="top-bar">
-      <div class="header-actions">
-        <button class="btn-download" id="dlBtn">📦 <span id="dlTxt">ZIP</span></button>
-        <button class="btn-tool" id="langToggleBtn" onclick="toggleAppLang()">🌐 EN</button>
-        <button class="btn-tool" id="themeToggleBtn" onclick="toggleAppTheme()">🌙 <span id="themeTxt">مسائي</span></button>
+  <div id="app-container">
+    <header>
+      <div class="top-bar">
+        <div class="header-actions">
+          <button class="btn-download" id="dlBtn">📦 <span id="dlTxt">ZIP</span></button>
+          <button class="btn-tool" id="langToggleBtn" onclick="toggleAppLang()">🌐 EN</button>
+          <button class="btn-tool" id="themeToggleBtn" onclick="toggleAppTheme()">🌙 <span id="themeTxt">مسائي</span></button>
+        </div>
+        <div class="logo">⚡ Jawad Builder</div>
       </div>
-      <div class="logo">⚡ Jawad Builder</div>
-    </div>
 
-    <div class="view-switcher">
-      <button class="switch-btn active" id="btnChat" onclick="switchView('chat')">💬 <span id="chatTxt">الشات</span></button>
-      <button class="switch-btn" id="btnPreview" onclick="switchView('preview')">👁️ <span id="prevTxt">المعاينة</span></button>
-      <button class="switch-btn" id="btnCode" onclick="switchView('code')">&lt;/&gt; <span id="codeTxt">الكود</span></button>
-    </div>
-  </header>
-
-  <main>
-    <div id="chatView" class="view-panel chat-panel active">
-      <input type="password" id="secretKey" class="secret-input" placeholder="ضع كلمة السر (OpenRouter API) هنا...">
-      
-      <div class="chat-box" id="chatBox">
-        <div class="msg ai-msg" id="welcomeMsg">مرحباً جواد! اكتب فكرتك هنا وسأقوم ببناء موقعك فوراً.</div>
+      <div class="view-switcher">
+        <button class="switch-btn active" id="btnChat" onclick="switchView('chat')">💬 <span id="chatTxt">الشات</span></button>
+        <button class="switch-btn" id="btnPreview" onclick="switchView('preview')">👁️ <span id="prevTxt">المعاينة</span></button>
+        <button class="switch-btn" id="btnCode" onclick="switchView('code')">&lt;/&gt; <span id="codeTxt">الكود</span></button>
       </div>
-      
-      <div class="input-area">
-        <input type="text" id="userInput" class="prompt-input" placeholder="اطلب تصميم موقع...">
-        <button class="btn-send" id="sendBtn">إرسال</button>
+    </header>
+
+    <main>
+      <div id="chatView" class="view-panel chat-panel active">
+        <input type="password" id="secretKey" class="secret-input" placeholder="ضع كلمة السر (OpenRouter API) هنا...">
+        
+        <div class="chat-box" id="chatBox">
+          <div class="msg ai-msg" id="welcomeMsg">مرحباً جواد! اكتب فكرتك هنا وسأقوم ببناء موقعك فوراً.</div>
+        </div>
+        
+        <div class="input-area">
+          <input type="text" id="userInput" class="prompt-input" placeholder="اطلب تصميم موقع...">
+          <button class="btn-send" id="sendBtn">إرسال</button>
+        </div>
       </div>
-    </div>
 
-    <div id="previewView" class="view-panel">
-      <iframe id="previewFrame" class="preview-frame"></iframe>
-    </div>
+      <div id="previewView" class="view-panel">
+        <iframe id="previewFrame" class="preview-frame"></iframe>
+      </div>
 
-    <div id="codeView" class="view-panel">
-      <textarea id="codeArea" placeholder="الكود البرمجي سيظهر هنا..."></textarea>
-    </div>
-  </main>
+      <div id="codeView" class="view-panel">
+        <textarea id="codeArea" placeholder="الكود البرمجي سيظهر هنا..."></textarea>
+      </div>
+    </main>
+  </div>
 
   <script>
+    // برمجة ضبط الارتفاع الحقيقي للجوال لمنع قطع الأسفل أو الأعلى
+    function setRealHeight() {
+      const vh = window.innerHeight;
+      document.getElementById('app-container').style.height = `${vh}px`;
+    }
+    window.addEventListener('resize', setRealHeight);
+    window.addEventListener('orientationchange', setRealHeight);
+    setRealHeight();
+
     const defaultHTML = `<!DOCTYPE html>
 <html lang="ar">
 <head>
