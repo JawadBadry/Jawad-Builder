@@ -93,33 +93,35 @@
     .header-actions { 
       display: flex; 
       align-items: center; 
-      gap: 6px; 
+      gap: 4px; 
     } 
     
-    .btn-tool { 
+    /* توحيد مقاسات جميع الأزرار العلوية بالمليمتر */
+    .btn-tool, .btn-download { 
       background: var(--bg-input); 
       color: var(--text-main); 
       border: 1px solid var(--border-color); 
-      padding: 6px 8px; 
+      padding: 6px 2px; 
       border-radius: 6px; 
       cursor: pointer; 
       font-size: 11px; 
       font-weight: 600; 
       white-space: nowrap; 
-      min-width: 75px; 
+      width: 68px; 
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
+      box-sizing: border-box;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .btn-download { 
       background: var(--accent-color); 
       color: #fff; 
       border: none; 
-      padding: 6px 10px; 
-      font-weight: 600; 
-      border-radius: 6px; 
-      cursor: pointer; 
-      font-size: 11px; 
-      white-space: nowrap; 
     }
 
     .view-switcher { 
@@ -201,18 +203,6 @@
       -webkit-text-security: disc; 
     } 
 
-    .btn-paste {
-      background: var(--bg-input);
-      color: var(--accent-color);
-      border: 1px solid var(--border-color);
-      padding: 0 10px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: bold;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    
     .chat-box { 
       flex: 1; 
       overflow-y: auto; 
@@ -352,6 +342,8 @@
   </div>
 
   <script>
+    let appLang = 'ar';
+
     function setRealHeight() {
       const vh = window.innerHeight;
       document.getElementById('app-container').style.height = `${vh}px`;
@@ -359,18 +351,6 @@
     window.addEventListener('resize', setRealHeight);
     window.addEventListener('orientationchange', setRealHeight);
     setRealHeight();
-
-    async function pasteFromClipboard() {
-      try {
-        const text = await navigator.clipboard.readText();
-        if (text) {
-          document.getElementById('secretKey').value = text;
-        }
-      } catch (err) {
-        document.getElementById('secretKey').focus();
-        document.execCommand('paste');
-      }
-    }
 
     const defaultHTML = `<!DOCTYPE html>
 <html lang="ar">
@@ -418,16 +398,13 @@
       const isLight = document.body.classList.contains('light-mode');
       const isEn = appLang === 'en';
       
-      // التعديل هنا: إذا كنا في الوضع الصباحي يظهر خيار التحويل إلى المسائي، والعكس صحيح
       const icon = isLight ? '🌙' : '☀️';
       let label = isEn ? (isLight ? 'Dark' : 'Light') : (isLight ? 'مسائي' : 'صباحي');
       
       document.getElementById('themeToggleBtn').innerHTML = `${icon} <span id="themeTxt">${label}</span>`;
     }
 
-    let appLang = 'ar';
-    function toggleAppLang() {
-      appLang = appLang === 'ar' ? 'en' : 'ar';
+    function updateLanguageUI() {
       const isEn = appLang === 'en';
       document.documentElement.lang = isEn ? 'en' : 'ar';
       document.documentElement.dir = isEn ? 'ltr' : 'rtl';
@@ -444,6 +421,11 @@
       document.getElementById('sendBtn').innerText = isEn ? 'Send' : 'إرسال';
 
       updateThemeButtonText();
+    }
+
+    function toggleAppLang() {
+      appLang = appLang === 'ar' ? 'en' : 'ar';
+      updateLanguageUI();
     }
 
     function updatePreview() {
@@ -527,7 +509,7 @@
       });
     });
 
-    updateThemeButtonText();
+    updateLanguageUI();
     updatePreview();
   </script>
 </body>
