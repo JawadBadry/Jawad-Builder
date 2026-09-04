@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Jawad Builder 🚀</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -29,16 +29,32 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; transition: background 0.2s, color 0.2s; }
-    body { display: flex; flex-direction: column; height: 100vh; background: var(--bg-main); color: var(--text-main); overflow: hidden; }
+    
+    html, body { 
+      height: 100%; 
+      width: 100%; 
+      background: var(--bg-main); 
+      color: var(--text-main); 
+      overflow: hidden; 
+    }
 
-    /* الهيدر مع إضافة مساحة حماية لشريط الجوال العلوي */
+    body { 
+      display: flex; 
+      flex-direction: column; 
+    }
+
+    /* الهيدر العلوي المتجاوب مع المنطقة الآمنة للشاشة */
     header { 
       display: flex; 
       flex-direction: column;
-      padding: 35px 12px 10px 12px; /* مسافة 35px في الأعلى لمنع تداخل شريط الجوال */
+      padding-top: max(10px, env(safe-area-inset-top)); /* يتكيف تلقائياً مع شريط النظام في التطبيق والمتصفح */
+      padding-left: 12px;
+      padding-right: 12px;
+      padding-bottom: 10px;
       background: var(--bg-panel); 
       border-bottom: 1px solid var(--border-color); 
       gap: 10px; 
+      z-index: 10;
     }
 
     .top-bar {
@@ -48,47 +64,209 @@
       width: 100%;
     }
 
-    .logo { font-size: 1rem; font-weight: 700; color: var(--accent-color); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
-    .header-actions { display: flex; align-items: center; gap: 6px; }
+    .logo { 
+      font-size: 1.05rem; 
+      font-weight: 700; 
+      color: var(--accent-color); 
+      display: flex; 
+      align-items: center; 
+      gap: 4px; 
+      white-space: nowrap; 
+    }
+
+    .header-actions { 
+      display: flex; 
+      align-items: center; 
+      gap: 6px; 
+    }
     
-    .btn-tool { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-color); padding: 5px 8px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; white-space: nowrap; }
-    .btn-download { background: var(--accent-color); color: #fff; border: none; padding: 5px 10px; font-weight: 600; border-radius: 6px; cursor: pointer; font-size: 11px; white-space: nowrap; }
+    .btn-tool { 
+      background: var(--bg-input); 
+      color: var(--text-main); 
+      border: 1px solid var(--border-color); 
+      padding: 6px 10px; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-size: 11px; 
+      font-weight: 600; 
+      white-space: nowrap; 
+    }
 
-    /* أزرار التنقل الرئيسية */
-    .view-switcher { display: flex; background: var(--bg-input); padding: 3px; border-radius: 8px; border: 1px solid var(--border-color); gap: 2px; width: 100%; }
-    .switch-btn { flex: 1; background: transparent; color: var(--text-muted); border: none; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; white-space: nowrap; }
-    .switch-btn.active { background: var(--accent-color); color: #fff; }
+    .btn-download { 
+      background: var(--accent-color); 
+      color: #fff; 
+      border: none; 
+      padding: 6px 12px; 
+      font-weight: 600; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-size: 11px; 
+      white-space: nowrap; 
+    }
 
-    /* المنطقة الرئيسية */
-    main { flex: 1; position: relative; width: 100%; overflow: hidden; }
+    /* شريط أزرار التنقل الرئيسية */
+    .view-switcher { 
+      display: flex; 
+      background: var(--bg-input); 
+      padding: 3px; 
+      border-radius: 8px; 
+      border: 1px solid var(--border-color); 
+      gap: 2px; 
+      width: 100%; 
+    }
+
+    .switch-btn { 
+      flex: 1; 
+      background: transparent; 
+      color: var(--text-muted); 
+      border: none; 
+      padding: 7px 10px; 
+      border-radius: 6px; 
+      font-size: 12px; 
+      font-weight: 600; 
+      cursor: pointer; 
+      text-align: center; 
+      white-space: nowrap; 
+    }
+
+    .switch-btn.active { 
+      background: var(--accent-color); 
+      color: #fff; 
+    }
+
+    /* المنطقة الرئيسية للعرض */
+    main { 
+      flex: 1; 
+      position: relative; 
+      width: 100%; 
+      overflow: hidden; 
+    }
 
     /* لوحات العرض */
-    .view-panel { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; background: var(--bg-main); }
-    .view-panel.active { display: flex; }
+    .view-panel { 
+      position: absolute; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%; 
+      display: none; 
+      flex-direction: column; 
+      background: var(--bg-main); 
+    }
+
+    .view-panel.active { 
+      display: flex; 
+    }
 
     /* لوحة الشات */
-    .chat-panel { padding: 12px; gap: 10px; height: 100%; background: var(--bg-panel); }
-    .secret-input { padding: 10px; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; outline: none; font-size: 12px; }
-    
-    .chat-box { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-    .msg { padding: 10px 12px; border-radius: 10px; font-size: 13px; max-width: 85%; word-break: break-word; line-height: 1.4; }
-    .user-msg { background: var(--accent-color); color: #fff; align-self: flex-start; }
-    body.en-mode .user-msg { align-self: flex-end; }
-    .ai-msg { background: var(--bg-input); color: var(--text-main); align-self: flex-end; border: 1px solid var(--border-color); }
-    body.en-mode .ai-msg { align-self: flex-start; }
+    .chat-panel { 
+      padding: 12px; 
+      gap: 10px; 
+      height: 100%; 
+      background: var(--bg-panel); 
+    }
 
-    /* حقل الإدخال مع مساحة حماية للشعار المائي السفلي */
+    .secret-input { 
+      padding: 10px; 
+      background: var(--bg-input); 
+      border: 1px solid var(--border-color); 
+      color: var(--text-main); 
+      border-radius: 8px; 
+      outline: none; 
+      font-size: 12px; 
+    }
+    
+    .chat-box { 
+      flex: 1; 
+      overflow-y: auto; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 10px; 
+      padding-bottom: 5px;
+    }
+
+    .msg { 
+      padding: 10px 14px; 
+      border-radius: 10px; 
+      font-size: 13px; 
+      max-width: 88%; 
+      word-break: break-word; 
+      line-height: 1.4; 
+    }
+
+    .user-msg { 
+      background: var(--accent-color); 
+      color: #fff; 
+      align-self: flex-start; 
+    }
+
+    body.en-mode .user-msg { 
+      align-self: flex-end; 
+    }
+
+    .ai-msg { 
+      background: var(--bg-input); 
+      color: var(--text-main); 
+      align-self: flex-end; 
+      border: 1px solid var(--border-color); 
+    }
+
+    body.en-mode .ai-msg { 
+      align-self: flex-start; 
+    }
+
+    /* حقل الإدخال السفلي المنسق والمتكيف */
     .input-area { 
       display: flex; 
       gap: 8px; 
-      padding-bottom: 25px; /* رفع منطقة الإرسال للأعلى لحمايتها من العلامة المائية */
+      padding-top: 4px;
+      padding-bottom: max(10px, env(safe-area-inset-bottom)); /* حماية الحقل في أسفل الشاشة */
     }
-    .prompt-input { flex: 1; padding: 10px; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; outline: none; font-size: 13px; }
-    .btn-send { background: var(--accent-color); color: #fff; border: none; padding: 0 16px; font-weight: 600; border-radius: 8px; cursor: pointer; font-size: 13px; }
+
+    .prompt-input { 
+      flex: 1; 
+      padding: 11px 12px; 
+      background: var(--bg-input); 
+      border: 1px solid var(--border-color); 
+      color: var(--text-main); 
+      border-radius: 8px; 
+      outline: none; 
+      font-size: 13px; 
+    }
+
+    .btn-send { 
+      background: var(--accent-color); 
+      color: #fff; 
+      border: none; 
+      padding: 0 18px; 
+      font-weight: 600; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-size: 13px; 
+      white-space: nowrap;
+    }
 
     /* لوحة المعاينة والكود */
-    .preview-frame { width: 100%; height: 100%; border: none; background: #ffffff; }
-    textarea { width: 100%; height: 100%; background: var(--bg-main); color: var(--text-main); border: none; padding: 14px; font-family: monospace; resize: none; outline: none; font-size: 12px; line-height: 1.5; }
+    .preview-frame { 
+      width: 100%; 
+      height: 100%; 
+      border: none; 
+      background: #ffffff; 
+    }
+
+    textarea { 
+      width: 100%; 
+      height: 100%; 
+      background: var(--bg-main); 
+      color: var(--text-main); 
+      border: none; 
+      padding: 14px; 
+      font-family: monospace; 
+      resize: none; 
+      outline: none; 
+      font-size: 12px; 
+      line-height: 1.5; 
+    }
   </style>
 </head>
 <body>
