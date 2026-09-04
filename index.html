@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jawad Builder 🚀</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    :root {
+      --bg-main: #0b0f17;
+      --bg-panel: #151c28;
+      --bg-input: #1e2738;
+      --border-color: #2a364f;
+      --accent-color: #3b82f6;
+      --accent-hover: #2563eb;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --workspace-bg: #070a0f;
+    }
+
+    /* الوضع الصباحي (Light Mode) */
+    body.light-mode {
+      --bg-main: #f1f5f9;
+      --bg-panel: #ffffff;
+      --bg-input: #e2e8f0;
+      --border-color: #cbd5e1;
+      --accent-color: #2563eb;
+      --accent-hover: #1d4ed8;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --workspace-bg: #e2e8f0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; transition: background 0.2s, color 0.2s; }
+    body { display: flex; flex-direction: column; height: 100vh; background: var(--bg-main); color: var(--text-main); overflow: hidden; }
+
+    /* الهيدر العلوي */
+    header { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: var(--bg-panel); border-bottom: 1px solid var(--border-color); }
+    .logo { font-size: 1.2rem; font-weight: 700; color: var(--accent-color); display: flex; align-items: center; gap: 8px; }
+    .header-actions { display: flex; align-items: center; gap: 10px; }
+    
+    .btn-tool { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }
+    .btn-tool:hover { border-color: var(--accent-color); }
+
+    .btn-download { background: var(--accent-color); color: #fff; border: none; padding: 8px 16px; font-weight: 600; border-radius: 6px; cursor: pointer; transition: 0.2s; font-size: 13px; }
+    .btn-download:hover { background: var(--accent-hover); }
+
+    /* الجسم الرئيسي */
+    main { display: flex; flex: 1; height: calc(100vh - 57px); }
+
+    /* لوحة المحادثة والذكاء الاصطناعي */
+    .chat-panel { width: 340px; background: var(--bg-panel); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 14px; gap: 12px; }
+    body.en-mode .chat-panel { border-left: none; border-right: 1px solid var(--border-color); }
+
+    .secret-input { padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; outline: none; font-size: 13px; }
+    .secret-input:focus { border-color: var(--accent-color); }
+
+    .chat-box { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-left: 4px; }
+    .msg { padding: 10px 14px; border-radius: 10px; font-size: 13px; max-width: 90%; word-break: break-word; line-height: 1.5; }
+    .user-msg { background: var(--accent-color); color: #fff; align-self: flex-start; border-bottom-right-radius: 2px; }
+    body.en-mode .user-msg { align-self: flex-end; border-bottom-right-radius: 10px; border-bottom-left-radius: 2px; }
+    .ai-msg { background: var(--bg-input); color: var(--text-main); align-self: flex-end; border-bottom-left-radius: 2px; border: 1px solid var(--border-color); }
+    body.en-mode .ai-msg { align-self: flex-start; border-bottom-left-radius: 10px; border-bottom-right-radius: 2px; }
+
+    .input-area { display: flex; gap: 8px; }
+    .prompt-input { flex: 1; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; outline: none; font-size: 13px; }
+    .prompt-input:focus { border-color: var(--accent-color); }
+    .btn-send { background: var(--accent-color); color: #fff; border: none; padding: 0 16px; font-weight: 600; border-radius: 8px; cursor: pointer; }
+
+    /* لوحة التبديل والمعاينة */
+    .workspace-panel { flex: 1; display: flex; flex-direction: column; background: var(--workspace-bg); }
+
+    .workspace-toolbar { display: flex; align-items: center; justify-content: flex-start; padding: 8px 16px; background: var(--bg-panel); border-bottom: 1px solid var(--border-color); gap: 8px; }
+    .tab-btn { background: transparent; color: var(--text-muted); border: none; padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+    .tab-btn:hover { color: var(--text-main); background: var(--bg-input); }
+    .tab-btn.active { background: var(--accent-color); color: #fff; }
+
+    .tab-content { flex: 1; display: none; height: 100%; width: 100%; }
+    .tab-content.active { display: flex; }
+
+    textarea { width: 100%; height: 100%; background: var(--bg-main); color: var(--text-main); border: none; padding: 16px; font-family: monospace; resize: none; outline: none; font-size: 13px; line-height: 1.6; }
+    .preview-frame { width: 100%; height: 100%; border: none; background: #ffffff; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">⚡ Jawad Builder</div>
+    <div class="header-actions">
+      <button class="btn-tool" id="themeToggleBtn" onclick="toggleAppTheme()">🌙 <span id="themeTxt">مسائي</span></button>
+      <button class="btn-tool" id="langToggleBtn" onclick="toggleAppLang()">🌐 English</button>
+      <button class="btn-download" id="dlBtn">📦 <span id="dlTxt">تنزيل ZIP</span></button>
+    </div>
+  </header>
+
+  <main>
+    <div class="chat-panel">
+      <input type="password" id="secretKey" class="secret-input" placeholder="ضع كلمة السر (OpenRouter API) هنا...">
+      
+      <div class="chat-box" id="chatBox">
+        <div class="msg ai-msg" id="welcomeMsg">مرحباً جواد! اكتب فكرتك هنا وسأقوم ببناء موقعك فوراً.</div>
+      </div>
+      
+      <div class="input-area">
+        <input type="text" id="userInput" class="prompt-input" placeholder="اطلب تصميم موقع...">
+        <button class="btn-send" id="sendBtn">إرسال</button>
+      </div>
+    </div>
+
+    <div class="workspace-panel">
+      <div class="workspace-toolbar">
+        <button class="tab-btn active" id="btnPreview" onclick="switchTab('preview')">👁️ <span id="prevTxt">المعاينة</span></button>
+        <button class="tab-btn" id="btnCode" onclick="switchTab('code')">&lt;/&gt; <span id="codeTxt">الكود</span></button>
+      </div>
+
+      <div id="previewTab" class="tab-content active">
+        <iframe id="previewFrame" class="preview-frame"></iframe>
+      </div>
+
+      <div id="codeTab" class="tab-content">
+        <textarea id="codeArea" placeholder="الكود البرمجي سيظهر هنا..."></textarea>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
