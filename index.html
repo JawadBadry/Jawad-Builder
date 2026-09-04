@@ -34,7 +34,7 @@
       padding: 0; 
       font-family: system-ui, -apple-system, sans-serif; 
       transition: background 0.2s, color 0.2s; 
-      -webkit-user-select: text !important; /* السماح بالتحديد والنسخ في نظام الأندرويد */
+      -webkit-user-select: text !important;
       user-select: text !important;
     }
     
@@ -97,19 +97,18 @@
     } 
     
     .btn-tool { 
-  background: var(--bg-input); 
-  color: var(--text-main); 
-  border: 1px solid var(--border-color); 
-  padding: 6px 8px; 
-  border-radius: 6px; 
-  cursor: pointer; 
-  font-size: 11px; 
-  font-weight: 600; 
-  white-space: nowrap; 
-  min-width: 75px; /* يحدد حداً أدنى للعرض لتبقى جميع الأزرار بحجم متناسق */
-  text-align: center;
-}
-
+      background: var(--bg-input); 
+      color: var(--text-main); 
+      border: 1px solid var(--border-color); 
+      padding: 6px 8px; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-size: 11px; 
+      font-weight: 600; 
+      white-space: nowrap; 
+      min-width: 75px; 
+      text-align: center;
+    }
 
     .btn-download { 
       background: var(--accent-color); 
@@ -183,7 +182,6 @@
       flex-direction: column;
     }
 
-    /* حاوي حقل كلمة السر مع زر اللصق السريع */
     .secret-container {
       display: flex;
       gap: 6px;
@@ -200,7 +198,7 @@
       border-radius: 8px; 
       outline: none; 
       font-size: 12px; 
-      -webkit-text-security: disc; /* تمويه النص بنقاط الأمان مع حفظ إمكانية النسخ/اللصق */
+      -webkit-text-security: disc; 
     } 
 
     .btn-paste {
@@ -315,7 +313,7 @@
         <div class="header-actions">
           <button class="btn-download" id="dlBtn">📦 <span id="dlTxt">ZIP</span></button>
           <button class="btn-tool" id="langToggleBtn" onclick="toggleAppLang()">🌐 EN</button>
-          <button class="btn-tool" id="themeToggleBtn" onclick="toggleAppTheme()">🌙 <span id="themeTxt">مسائي</span></button>
+          <button class="btn-tool" id="themeToggleBtn" onclick="toggleAppTheme()"></button>
         </div>
         <div class="logo">⚡ Jawad Builder</div>
       </div>
@@ -362,7 +360,6 @@
     window.addEventListener('orientationchange', setRealHeight);
     setRealHeight();
 
-    // دالة اللصق المباشر من حافظة الجهاز بنقرة واحدة
     async function pasteFromClipboard() {
       try {
         const text = await navigator.clipboard.readText();
@@ -420,8 +417,11 @@
     function updateThemeButtonText() {
       const isLight = document.body.classList.contains('light-mode');
       const isEn = appLang === 'en';
-      const icon = isLight ? '☀️' : '🌙';
-      let label = isEn ? (isLight ? 'Light' : 'Dark') : (isLight ? 'صباحي' : 'مسائي');
+      
+      // التعديل هنا: إذا كنا في الوضع الصباحي يظهر خيار التحويل إلى المسائي، والعكس صحيح
+      const icon = isLight ? '🌙' : '☀️';
+      let label = isEn ? (isLight ? 'Dark' : 'Light') : (isLight ? 'مسائي' : 'صباحي');
+      
       document.getElementById('themeToggleBtn').innerHTML = `${icon} <span id="themeTxt">${label}</span>`;
     }
 
@@ -439,7 +439,6 @@
       document.getElementById('prevTxt').innerText = isEn ? 'Preview' : 'المعاينة';
       document.getElementById('codeTxt').innerText = isEn ? 'Code' : 'الكود';
       document.getElementById('secretKey').placeholder = isEn ? 'Enter API Key...' : 'ضع مفتاح كلمة السر هنا...';
-      document.getElementById('pasteTxt').innerText = isEn ? 'Paste' : 'لصق';
       document.getElementById('welcomeMsg').innerText = isEn ? 'Hello Jawad! Type your idea here.' : 'مرحباً جواد! اكتب فكرتك هنا وسأقوم ببناء موقعك فوراً عبر Jawad Builder.';
       document.getElementById('userInput').placeholder = isEn ? 'Ask to build a website...' : 'اطلب تصميم موقع...';
       document.getElementById('sendBtn').innerText = isEn ? 'Send' : 'إرسال';
@@ -528,6 +527,7 @@
       });
     });
 
+    updateThemeButtonText();
     updatePreview();
   </script>
 </body>
