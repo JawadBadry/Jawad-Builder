@@ -436,6 +436,37 @@
 
     document.getElementById('codeArea').addEventListener('input', updatePreview);
 
+    // دالة إرسال الطلب مع دعم إعادة المحاولة تلقائيًا عند وجود ضغط على السيرفر
+    async function fetchWithRetry(url, payload, retries = 3, delay = 2000) {
+      for (let i = 0; i < retries; i++) {
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await response.json();
+
+          // إذا نجح الطلب نرجعه مباشرة
+          if (response.ok) return { success: true, data };
+
+          // إذا كان الخطأ بسبب الضغط العالي، ننتظر ثم نعيد المحاولة
+          const isServerBusy = response.status === 503 || response.status === 429 || (data.error && data.error.message && data.error.message.includes('high demand'));
+          if (isServerBusy && i < retries - 1) {
+            addMessage(appLang === 'en' ? `Server busy, retrying (${i + 1}/${retries})...` : `السيرفر مشغول حالياً، جاري إعادة المحاولة تلقائياً (${i + 1}/${retries})...`, 'ai-msg');
+            await new Promise(res => setTimeout(res, delay));
+            continue;
+          }
+
+          return { success: false, data };
+        } catch (err) {
+          if (i === retries - 1) throw err;
+          await new Promise(res => setTimeout(res, delay));
+        }
+      }
+    }
+
     async function generateCode() {
       const secretKey = document.getElementById('secretKey').value.trim();
       const input = document.getElementById('userInput');
@@ -452,7 +483,6 @@
       addMessage(appLang === 'en' ? 'Generating website code...' : 'جاري توليد كود الموقع...', 'ai-msg');
 
       try {
-        // استخدام gemini-flash-latest يضمن عدم توقف الـ API عند تحديث الإصدارات
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${secretKey}`;
 
         const systemInstruction = `You are a world-class senior frontend developer and UI/UX designer.
@@ -464,24 +494,18 @@ Rules:
 3. COMPLETENESS: Write the complete code starting with <!DOCTYPE html>. NEVER cut off, skip, or truncate any code.
 4. RESPONSE FORMAT: Return ONLY the raw HTML code without markdown code blocks (\`\`\`html) or conversational text.`;
 
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: `${systemInstruction}\n\nUser Request: "${prompt}"`
-              }]
+        const payload = {
+          contents: [{
+            parts: [{
+              text: `${systemInstruction}\n\nUser Request: "${prompt}"`
             }]
-          })
-        });
+          }]
+        };
 
-        const data = await response.json();
+        const result = await fetchWithRetry(url, payload);
 
-        if (response.ok && data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-          let generatedCode = data.candidates[0].content.parts[0].text;
+        if (result.success && result.data.candidates && result.data.candidates[0]?.content?.parts[0]?.text) {
+          let generatedCode = result.data.candidates[0].content.parts[0].text;
           generatedCode = generatedCode.replace(/^```html/gi, '').replace(/^```/gi, '').replace(/```$/gi, '').trim();
 
           document.getElementById('codeArea').value = generatedCode;
@@ -489,7 +513,7 @@ Rules:
           switchView('preview');
           addMessage(appLang === 'en' ? 'Website built successfully!' : 'تم بناء الموقع بنجاح!', 'ai-msg');
         } else {
-          const errDetail = data.error ? data.error.message : 'Check API Key.';
+          const errDetail = result.data && result.data.error ? result.data.error.message : 'Check API Key.';
           addMessage((appLang === 'en' ? 'Error: ' : 'خطأ: ') + errDetail, 'ai-msg');
         }
       } catch (err) {
