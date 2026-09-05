@@ -336,4 +336,325 @@
       width: 100%; 
       height: 100%; 
       border: none; 
-      background: #ffffff;
+      background: #ffffff; 
+    }
+
+    textarea { 
+      width: 100%; 
+      height: 100%; 
+      background: var(--bg-main); 
+      color: var(--text-main); 
+      border: none; 
+      padding: 14px; 
+      font-family: 'Fira Code', monospace, Consolas; 
+      resize: none; 
+      outline: none; 
+      font-size: 12.5px; 
+      line-height: 1.6; 
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app-container">
+    <header>
+      <div class="top-bar">
+        <div class="header-actions">
+          <button class="btn-download" id="dlBtn">📦 <span id="dlTxt">ZIP</span></button>
+          <button class="btn-tool" id="shareBtn" onclick="shareProject()">🔗 <span id="shareTxt">مشاركة</span></button>
+          <button class="btn-tool" id="langToggleBtn" onclick="toggleAppLang()">🌐 EN</button>
+          <button class="btn-tool" id="themeToggleBtn" onclick="toggleAppTheme()"></button>
+        </div>
+        <div class="logo">🚀 Jawad Builder</div>
+      </div>
+
+      <div class="view-switcher">
+        <button class="switch-btn active" id="btnChat" onclick="switchView('chat')">💬 <span id="chatTxt">الشات</span></button>
+        <button class="switch-btn" id="btnPreview" onclick="switchView('preview')">👁️ <span id="prevTxt">المعاينة</span></button>
+        <button class="switch-btn" id="btnCode" onclick="switchView('code')">&lt;/&gt; <span id="codeTxt">الكود</span></button>
+      </div>
+    </header>
+
+    <main>
+      <div id="chatView" class="view-panel chat-panel active">
+        <div class="secret-container">
+          <input type="password" id="secretKey" class="secret-input" placeholder="كلمة السر / API Key..." autocomplete="off">
+        </div>
+        
+        <div class="chat-box" id="chatBox">
+          <div class="msg ai-msg" id="welcomeMsg">مرحباً جواد! اكتب فكرتك هنا وسأقوم ببناء موقعك الاحترافي بسلاسة وسرعة فائقة.</div>
+        </div>
+        
+        <div class="input-area">
+          <input type="text" id="userInput" class="prompt-input" placeholder="اطلب تصميم موقع...">
+          <button class="btn-send" id="sendBtn">إرسال</button>
+        </div>
+      </div>
+
+      <div id="previewView" class="view-panel">
+        <iframe id="previewFrame" class="preview-frame" sandbox="allow-scripts allow-modals allow-forms"></iframe>
+      </div>
+
+      <div id="codeView" class="view-panel">
+        <textarea id="codeArea" placeholder="الكود البرمجي سيظهر هنا..."></textarea>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let appLang = 'ar';
+
+    // حفظ واسترجاع مفتاح API محليًا
+    const secretInput = document.getElementById('secretKey');
+    secretInput.value = localStorage.getItem('jawad_builder_key') || '';
+    secretInput.addEventListener('input', () => {
+      localStorage.setItem('jawad_builder_key', secretInput.value.trim());
+    });
+
+    function setRealHeight() {
+      const vh = window.innerHeight;
+      document.getElementById('app-container').style.height = `${vh}px`;
+    }
+    window.addEventListener('resize', setRealHeight);
+    window.addEventListener('orientationchange', setRealHeight);
+    setRealHeight();
+
+    const defaultHTML = `<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: system-ui, sans-serif; text-align: center; padding-top: 80px; background: #0f172a; color: #fff; margin: 0; }
+    h1 { background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.2rem; margin-bottom: 10px; }
+    p { color: #94a3b8; font-size: 1.1rem; margin-bottom: 25px; }
+    button { padding: 12px 28px; background: linear-gradient(135deg, #6366f1, #a855f7); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
+  </style>
+</head>
+<body>
+  <h1>Jawad Builder 🚀</h1>
+  <p>جاهز لتصميم مواقع فائقة الجمال والنعومة!</p>
+  <button onclick="alert('تجربة سلسة وجميلة!')">تجربة الموقع</button>
+</body>
+</html>`;
+
+    document.getElementById('codeArea').value = defaultHTML;
+
+    function switchView(viewName) {
+      document.querySelectorAll('.view-panel').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.switch-btn').forEach(el => el.classList.remove('active'));
+
+      if (viewName === 'chat') {
+        document.getElementById('chatView').classList.add('active');
+        document.getElementById('btnChat').classList.add('active');
+      } else if (viewName === 'preview') {
+        document.getElementById('previewView').classList.add('active');
+        document.getElementById('btnPreview').classList.add('active');
+        updatePreview();
+      } else if (viewName === 'code') {
+        document.getElementById('codeView').classList.add('active');
+        document.getElementById('btnCode').classList.add('active');
+      }
+    }
+
+    function toggleAppTheme() {
+      document.body.classList.toggle('light-mode');
+      updateThemeButtonText();
+    }
+
+    function updateThemeButtonText() {
+      const isLight = document.body.classList.contains('light-mode');
+      const isEn = appLang === 'en';
+      
+      const icon = isLight ? '🌙' : '☀️';
+      let label = isEn ? (isLight ? 'Dark' : 'Light') : (isLight ? 'مسائي' : 'صباحي');
+      
+      document.getElementById('themeToggleBtn').innerHTML = `${icon} <span id="themeTxt">${label}</span>`;
+    }
+
+    function updateLanguageUI() {
+      const isEn = appLang === 'en';
+      document.documentElement.lang = isEn ? 'en' : 'ar';
+      document.documentElement.dir = isEn ? 'ltr' : 'rtl';
+      document.body.classList.toggle('en-mode', isEn);
+
+      document.getElementById('langToggleBtn').innerText = isEn ? '🌐 AR' : '🌐 EN';
+      document.getElementById('dlTxt').innerText = 'ZIP';
+      document.getElementById('shareTxt').innerText = isEn ? 'Share' : 'مشاركة';
+      document.getElementById('chatTxt').innerText = isEn ? 'Chat' : 'الشات';
+      document.getElementById('prevTxt').innerText = isEn ? 'Preview' : 'المعاينة';
+      document.getElementById('codeTxt').innerText = isEn ? 'Code' : 'الكود';
+      document.getElementById('secretKey').placeholder = isEn ? 'Password / API Key...' : 'كلمة السر / API Key...';
+      document.getElementById('welcomeMsg').innerText = isEn ? 'Hello Jawad! Type your idea here to generate your site.' : 'مرحباً جواد! اكتب فكرتك هنا وسأقوم ببناء موقعك الاحترافي بسلاسة وسرعة فائقة.';
+      document.getElementById('userInput').placeholder = isEn ? 'Ask to build a website...' : 'اطلب تصميم موقع...';
+      document.getElementById('sendBtn').innerText = isEn ? 'Send' : 'إرسال';
+
+      updateThemeButtonText();
+    }
+
+    function toggleAppLang() {
+      appLang = appLang === 'ar' ? 'en' : 'ar';
+      updateLanguageUI();
+    }
+
+    function updatePreview() {
+      const code = document.getElementById('codeArea').value;
+      document.getElementById('previewFrame').srcdoc = code;
+    }
+
+    document.getElementById('codeArea').addEventListener('input', updatePreview);
+
+    async function getActiveModel(apiKey) {
+      try {
+        const res = await fetch("[https://api.groq.com/openai/v1/models](https://api.groq.com/openai/v1/models)", {
+          headers: { "Authorization": `Bearer ${apiKey}` }
+        });
+        const data = await res.json();
+        if (data.data && data.data.length > 0) {
+          const availableModels = data.data.map(m => m.id);
+          const preferredList = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.6-27b"];
+          for (let pref of preferredList) {
+            if (availableModels.includes(pref)) return pref;
+          }
+          return availableModels[0];
+        }
+      } catch (e) {
+        console.error("Failed to fetch models list", e);
+      }
+      return "llama-3.3-70b-versatile";
+    }
+
+    async function generateCode() {
+      const secretKey = document.getElementById('secretKey').value.trim();
+      const input = document.getElementById('userInput');
+      const sendBtn = document.getElementById('sendBtn');
+      const prompt = input.value.trim();
+      
+      if (!prompt) return;
+      if (!secretKey) {
+        alert(appLang === 'en' ? 'Please enter the Password first!' : 'يرجى إدخال كلمة السر أولاً!');
+        return;
+      }
+
+      addMessage(prompt, 'user-msg');
+      input.value = '';
+      sendBtn.disabled = true;
+      sendBtn.innerText = appLang === 'en' ? 'Building...' : 'جاري التوليد...';
+
+      addMessage(appLang === 'en' ? 'Processing design...' : 'جاري تصميم الموقع وسحب الأكواد...', 'ai-msg');
+
+      try {
+        const activeModel = await getActiveModel(secretKey);
+        const url = "[https://api.groq.com/openai/v1/chat/completions](https://api.groq.com/openai/v1/chat/completions)";
+
+        const systemInstruction = `You are a world-class senior frontend developer and UI/UX designer.
+Your task is to generate ONLY the HTML code (with embedded CSS and JS) for the requested webpage.
+STRICT RULE: Do NOT generate an application wrapper or clone of Jawad Builder. Generate ONLY the standalone target website/webpage requested by the user.
+
+Rules:
+1. DESIGN & STYLE: Use modern CSS styles, smooth UI elements, gradient accents, soft rounded corners, and responsive layout.
+2. FUNCTIONALITY: All buttons, components, and JS logic MUST work without errors.
+3. COMPLETENESS: Write complete single-file code starting with <!DOCTYPE html>.
+4. RESPONSE FORMAT: Return ONLY the raw HTML code without markdown (\`\`\`html) or conversational text.`;
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${secretKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: activeModel,
+            messages: [
+              { role: "system", content: systemInstruction },
+              { role: "user", content: prompt }
+            ],
+            temperature: 0.2
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.choices && data.choices[0]?.message?.content) {
+          let generatedCode = data.choices[0].message.content;
+          generatedCode = generatedCode.replace(/^```html/gi, '').replace(/^```/gi, '').replace(/```$/gi, '').trim();
+
+          if (generatedCode.includes('Jawad Builder') && generatedCode.includes('previewFrame')) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(generatedCode, 'text/html');
+            const innerCode = doc.querySelector('#codeArea')?.value || doc.body.innerHTML;
+            if (innerCode && innerCode.trim().length > 20) {
+              generatedCode = innerCode;
+            }
+          }
+
+          document.getElementById('codeArea').value = generatedCode;
+          updatePreview();
+          switchView('preview');
+          addMessage(appLang === 'en' ? 'Website built successfully!' : 'تم بناء الموقع بنجاح!', 'ai-msg');
+        } else {
+          const errDetail = data.error ? data.error.message : 'Please check key credentials.';
+          addMessage((appLang === 'en' ? 'Error: ' : 'خطأ: ') + errDetail, 'ai-msg');
+        }
+      } catch (err) {
+        addMessage(appLang === 'en' ? 'Network error.' : 'حدث خطأ أثناء الاتصال بالشبكة.', 'ai-msg');
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.innerText = appLang === 'en' ? 'Send' : 'إرسال';
+      }
+    }
+
+    document.getElementById('sendBtn').addEventListener('click', generateCode);
+    document.getElementById('userInput').addEventListener('keydown', e => { if (e.key === 'Enter') generateCode(); });
+
+    function addMessage(text, className) {
+      const box = document.getElementById('chatBox');
+      const msg = document.createElement('div');
+      msg.className = 'msg ' + className;
+      msg.innerText = text;
+      box.appendChild(msg);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    document.getElementById('dlBtn').addEventListener('click', function() {
+      const zip = new JSZip();
+      zip.file("index.html", document.getElementById('codeArea').value);
+      zip.generateAsync({type:"blob"}).then(content => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(content);
+        a.download = "jawad-project.zip";
+        a.click();
+      });
+    });
+
+    async function shareProject() {
+      const code = document.getElementById('codeArea').value;
+      if (navigator.share) {
+        try {
+          const file = new File([code], "index.html", { type: "text/html" });
+          await navigator.share({
+            title: 'Jawad Builder Project',
+            text: 'مشروعي المصمم عبر Jawad Builder 🚀',
+            files: [file]
+          });
+        } catch (err) {
+          copyCodeToClipboard();
+        }
+      } else {
+        copyCodeToClipboard();
+      }
+    }
+
+    function copyCodeToClipboard() {
+      const code = document.getElementById('codeArea').value;
+      navigator.clipboard.writeText(code).then(() => {
+        alert(appLang === 'en' ? 'Code copied to clipboard!' : 'تم نسخ الكود إلى الحافظة!');
+      }).catch(() => {
+        alert(appLang === 'en' ? 'Sharing failed.' : 'تعذر المشاركة.');
+      });
+    }
+
+    updateLanguageUI();
+    updatePreview();
+  </script>
+</body>
+</html>
