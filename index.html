@@ -96,7 +96,7 @@
       gap: 4px; 
     } 
     
-    /* توحيد مقاسات جميع الأزرار العلوية بالمليمتر */
+    /* توحيد مقاسات جميع الأزرار العلوية بنفس الأبعاد */
     .btn-tool, .btn-download { 
       background: var(--bg-input); 
       color: var(--text-main); 
@@ -302,6 +302,7 @@
       <div class="top-bar">
         <div class="header-actions">
           <button class="btn-download" id="dlBtn">📦 <span id="dlTxt">ZIP</span></button>
+          <button class="btn-tool" id="shareBtn" onclick="shareProject()">🔗 <span id="shareTxt">مشاركة</span></button>
           <button class="btn-tool" id="langToggleBtn" onclick="toggleAppLang()">🌐 EN</button>
           <button class="btn-tool" id="themeToggleBtn" onclick="toggleAppTheme()"></button>
         </div>
@@ -412,6 +413,7 @@
 
       document.getElementById('langToggleBtn').innerText = isEn ? '🌐 AR' : '🌐 EN';
       document.getElementById('dlTxt').innerText = 'ZIP';
+      document.getElementById('shareTxt').innerText = isEn ? 'Share' : 'مشاركة';
       document.getElementById('chatTxt').innerText = isEn ? 'Chat' : 'الشات';
       document.getElementById('prevTxt').innerText = isEn ? 'Preview' : 'المعاينة';
       document.getElementById('codeTxt').innerText = isEn ? 'Code' : 'الكود';
@@ -451,7 +453,17 @@
       addMessage(appLang === 'en' ? 'Generating website code...' : 'جاري توليد كود الموقع...', 'ai-msg');
 
       try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${secretKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${secretKey}`;
+
+        // تعليمات تحسين الكود الممررة إلى النموذج
+        const systemInstruction = `You are a world-class senior frontend developer and UI/UX designer.
+Your task is to generate a PERFECT, FULLY FUNCTIONAL, BEAUTIFUL, and RESPONSIVE single-file HTML document (with embeded CSS and JS) matching the user's request.
+
+Rules:
+1. DESIGN & STYLE: Use modern CSS styles, smooth UI elements, proper flexbox/grid layout, dark/light harmonious colors, hover effects, and crisp typography.
+2. FUNCTIONALITY: All buttons, interactive components, and JavaScript logic MUST work without errors.
+3. COMPLETENESS: Write the complete code starting with <!DOCTYPE html>. NEVER cut off, skip, or truncate any code.
+4. RESPONSE FORMAT: Return ONLY the raw HTML code without markdown code blocks (\`\`\`html) or conversational text.`;
 
         const response = await fetch(url, {
           method: 'POST',
@@ -461,7 +473,7 @@
           body: JSON.stringify({
             contents: [{
               parts: [{
-                text: `You are an expert web developer. Generate a COMPLETE, FULLY WORKING single-file HTML document (including inline CSS and JavaScript) for this request: "${prompt}". NEVER truncate or cut off the code. Ensure all HTML tags are properly closed. Return ONLY raw HTML code starting with <!DOCTYPE html> without markdown blocks.`
+                text: `${systemInstruction}\n\nUser Request: "${prompt}"`
               }]
             }]
           })
@@ -508,6 +520,33 @@
         a.click();
       });
     });
+
+    async function shareProject() {
+      const code = document.getElementById('codeArea').value;
+      if (navigator.share) {
+        try {
+          const file = new File([code], "index.html", { type: "text/html" });
+          await navigator.share({
+            title: 'Jawad Builder Project',
+            text: 'مشروعي المصمم عبر Jawad Builder 🚀',
+            files: [file]
+          });
+        } catch (err) {
+          copyCodeToClipboard();
+        }
+      } else {
+        copyCodeToClipboard();
+      }
+    }
+
+    function copyCodeToClipboard() {
+      const code = document.getElementById('codeArea').value;
+      navigator.clipboard.writeText(code).then(() => {
+        alert(appLang === 'en' ? 'Code copied to clipboard!' : 'تم نسخ الكود إلى الحافظة!');
+      }).catch(() => {
+        alert(appLang === 'en' ? 'Sharing failed.' : 'تعذر المشاركة.');
+      });
+    }
 
     updateLanguageUI();
     updatePreview();
