@@ -436,6 +436,28 @@
 
     document.getElementById('codeArea').addEventListener('input', updatePreview);
 
+    // دالة تجلب أفضل نموذج متاح ومفعل في حساب المفتاح تلقائياً
+    async function getActiveModel(apiKey) {
+      try {
+        const res = await fetch("https://api.groq.com/openai/v1/models", {
+          headers: { "Authorization": `Bearer ${apiKey}` }
+        });
+        const data = await res.json();
+        if (data.data && data.data.length > 0) {
+          // ترشيح النموذج الأفضل أو أخذ أحدهم
+          const availableModels = data.data.map(m => m.id);
+          const preferredList = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.6-27b"];
+          for (let pref of preferredList) {
+            if (availableModels.includes(pref)) return pref;
+          }
+          return availableModels[0]; // لو لم يجد المفضلين يأخذ أول نموذج متاح بالحساب
+        }
+      } catch (e) {
+        console.error("Failed to fetch models list, fallback used", e);
+      }
+      return "llama-3.3-70b-versatile"; // احتياطي
+    }
+
     async function generateCode() {
       const secretKey = document.getElementById('secretKey').value.trim();
       const input = document.getElementById('userInput');
@@ -449,9 +471,12 @@
 
       addMessage(prompt, 'user-msg');
       input.value = '';
-      addMessage(appLang === 'en' ? 'Generating website via Groq...' : 'جاري توليد الموقع عبر Groq...', 'ai-msg');
+      addMessage(appLang === 'en' ? 'Fetching active model...' : 'جاري الفحص واختيار النموذج المتاح...', 'ai-msg');
 
       try {
+        // جلب نموذج مفعل وحقيقي تلقائياً
+        const activeModel = await getActiveModel(secretKey);
+
         const url = "https://api.groq.com/openai/v1/chat/completions";
 
         const systemInstruction = `You are a world-class senior frontend developer and UI/UX designer.
@@ -470,7 +495,7 @@ Rules:
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            model: "llama-3.3-70b-versatile", // ✅ النموذج النشط، المعتمد والمجاني رسمياً على منصة Groq
+            model: activeModel, // ✅ نموذج متحرك وديناميكي يمنع حدوث خطأ النموذج غير المتاح
             messages: [
               { role: "system", content: systemInstruction },
               { role: "user", content: prompt }
@@ -488,7 +513,7 @@ Rules:
           document.getElementById('codeArea').value = generatedCode;
           updatePreview();
           switchView('preview');
-          addMessage(appLang === 'en' ? 'Website built successfully!' : 'تم بناء الموقع بنجاح عبر Groq!', 'ai-msg');
+          addMessage(appLang === 'en' ? 'Website built successfully!' : `تم بناء الموقع بنجاح بواسطة (${activeModel})!`, 'ai-msg');
         } else {
           const errDetail = data.error ? data.error.message : 'Check Groq API Key.';
           addMessage((appLang === 'en' ? 'Error: ' : 'خطأ: ') + errDetail, 'ai-msg');
