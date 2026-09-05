@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Jawad Builder 🚀</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22[http://www.w3.org/2000/svg%22](http://www.w3.org/2000/svg%22) viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
-  <script src="[https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js](https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js)"></script>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     :root {
       --bg-main: #0b0f19;
@@ -322,12 +322,7 @@
       box-shadow: var(--shadow-glow);
     }
 
-    .btn-send:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .btn-send:hover:not(:disabled) {
+    .btn-send:hover {
       background: var(--accent-hover);
       transform: translateY(-1px);
     }
@@ -378,7 +373,7 @@
     <main>
       <div id="chatView" class="view-panel chat-panel active">
         <div class="secret-container">
-          <input type="password" id="secretKey" class="secret-input" placeholder="كلمة السر / API Key..." autocomplete="off">
+          <input type="text" id="secretKey" class="secret-input" placeholder="كلمة السر..." autocomplete="off">
         </div>
         
         <div class="chat-box" id="chatBox">
@@ -403,13 +398,6 @@
 
   <script>
     let appLang = 'ar';
-
-    // حفظ واسترجاع مفتاح API محليًا
-    const secretInput = document.getElementById('secretKey');
-    secretInput.value = localStorage.getItem('jawad_builder_key') || '';
-    secretInput.addEventListener('input', () => {
-      localStorage.setItem('jawad_builder_key', secretInput.value.trim());
-    });
 
     function setRealHeight() {
       const vh = window.innerHeight;
@@ -483,7 +471,7 @@
       document.getElementById('chatTxt').innerText = isEn ? 'Chat' : 'الشات';
       document.getElementById('prevTxt').innerText = isEn ? 'Preview' : 'المعاينة';
       document.getElementById('codeTxt').innerText = isEn ? 'Code' : 'الكود';
-      document.getElementById('secretKey').placeholder = isEn ? 'Password / API Key...' : 'كلمة السر / API Key...';
+      document.getElementById('secretKey').placeholder = isEn ? 'Password...' : 'كلمة السر...';
       document.getElementById('welcomeMsg').innerText = isEn ? 'Hello Jawad! Type your idea here to generate your site.' : 'مرحباً جواد! اكتب فكرتك هنا وسأقوم ببناء موقعك الاحترافي بسلاسة وسرعة فائقة.';
       document.getElementById('userInput').placeholder = isEn ? 'Ask to build a website...' : 'اطلب تصميم موقع...';
       document.getElementById('sendBtn').innerText = isEn ? 'Send' : 'إرسال';
@@ -498,14 +486,26 @@
 
     function updatePreview() {
       const code = document.getElementById('codeArea').value;
-      document.getElementById('previewFrame').srcdoc = code;
+      const previewFrame = document.getElementById('previewFrame');
+      
+      previewFrame.srcdoc = code;
+      
+      try {
+        if (previewFrame.contentDocument) {
+          previewFrame.contentDocument.open();
+          previewFrame.contentDocument.write(code);
+          previewFrame.contentDocument.close();
+        }
+      } catch (e) {
+        console.log("Preview handled via srcdoc");
+      }
     }
 
     document.getElementById('codeArea').addEventListener('input', updatePreview);
 
     async function getActiveModel(apiKey) {
       try {
-        const res = await fetch("[https://api.groq.com/openai/v1/models](https://api.groq.com/openai/v1/models)", {
+        const res = await fetch("https://api.groq.com/openai/v1/models", {
           headers: { "Authorization": `Bearer ${apiKey}` }
         });
         const data = await res.json();
@@ -526,7 +526,6 @@
     async function generateCode() {
       const secretKey = document.getElementById('secretKey').value.trim();
       const input = document.getElementById('userInput');
-      const sendBtn = document.getElementById('sendBtn');
       const prompt = input.value.trim();
       
       if (!prompt) return;
@@ -537,14 +536,11 @@
 
       addMessage(prompt, 'user-msg');
       input.value = '';
-      sendBtn.disabled = true;
-      sendBtn.innerText = appLang === 'en' ? 'Building...' : 'جاري التوليد...';
-
       addMessage(appLang === 'en' ? 'Processing design...' : 'جاري تصميم الموقع وسحب الأكواد...', 'ai-msg');
 
       try {
         const activeModel = await getActiveModel(secretKey);
-        const url = "[https://api.groq.com/openai/v1/chat/completions](https://api.groq.com/openai/v1/chat/completions)";
+        const url = "https://api.groq.com/openai/v1/chat/completions";
 
         const systemInstruction = `You are a world-class senior frontend developer and UI/UX designer.
 Your task is to generate ONLY the HTML code (with embedded CSS and JS) for the requested webpage.
@@ -597,9 +593,6 @@ Rules:
         }
       } catch (err) {
         addMessage(appLang === 'en' ? 'Network error.' : 'حدث خطأ أثناء الاتصال بالشبكة.', 'ai-msg');
-      } finally {
-        sendBtn.disabled = false;
-        sendBtn.innerText = appLang === 'en' ? 'Send' : 'إرسال';
       }
     }
 
@@ -653,8 +646,10 @@ Rules:
       });
     }
 
-    updateLanguageUI();
-    updatePreview();
+    window.addEventListener('DOMContentLoaded', () => {
+      updateLanguageUI();
+      updatePreview();
+    });
   </script>
 </body>
 </html>
