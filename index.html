@@ -452,10 +452,11 @@
       addMessage(appLang === 'en' ? 'Generating website code...' : 'جاري توليد كود الموقع...', 'ai-msg');
 
       try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${secretKey}`;
+        // استخدام gemini-flash-latest يضمن عدم توقف الـ API عند تحديث الإصدارات
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${secretKey}`;
 
         const systemInstruction = `You are a world-class senior frontend developer and UI/UX designer.
-Your task is to generate a PERFECT, FULLY FUNCTIONAL, BEAUTIFUL, and RESPONSIVE single-file HTML document (with embeded CSS and JS) matching the user's request.
+Your task is to generate a PERFECT, FULLY FUNCTIONAL, BEAUTIFUL, and RESPONSIVE single-file HTML document (with embedded CSS and JS) matching the user's request.
 
 Rules:
 1. DESIGN & STYLE: Use modern CSS styles, smooth UI elements, proper flexbox/grid layout, dark/light harmonious colors, hover effects, and crisp typography.
