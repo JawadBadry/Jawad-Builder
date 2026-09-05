@@ -69,10 +69,10 @@
     header { 
       display: flex; 
       flex-direction: column;
-      padding: 12px 14px;
+      padding: 10px 12px;
       background: var(--bg-panel); 
       border-bottom: 1px solid var(--border-color); 
-      gap: 10px; 
+      gap: 8px; 
       z-index: 99;
       flex-shrink: 0;
       backdrop-filter: blur(10px);
@@ -85,17 +85,18 @@
       align-items: center;
       width: 100%;
       direction: ltr;
+      gap: 8px;
     }
 
     .logo { 
-      font-size: 1.1rem; 
+      font-size: 1rem; 
       font-weight: 800; 
       background: var(--accent-grad);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       display: flex; 
       align-items: center; 
-      gap: 6px; 
+      gap: 4px; 
       white-space: nowrap; 
       letter-spacing: 0.5px;
     }
@@ -103,26 +104,30 @@
     .header-actions { 
       display: flex; 
       align-items: center; 
-      gap: 6px; 
+      gap: 4px; 
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      max-width: 100%;
+      padding-bottom: 2px;
     } 
     
     .btn-tool, .btn-download { 
       background: var(--bg-input); 
       color: var(--text-main); 
       border: 1px solid var(--border-color); 
-      padding: 6px 10px; 
-      border-radius: 10px; 
+      padding: 4px 8px; 
+      border-radius: 8px; 
       cursor: pointer; 
-      font-size: 12px; 
+      font-size: 11px; 
       font-weight: 600; 
       white-space: nowrap; 
-      height: 36px;
+      height: 32px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       text-align: center;
       box-sizing: border-box;
-      backdrop-filter: blur(4px);
+      flex-shrink: 0;
     }
 
     .btn-tool:hover {
@@ -145,8 +150,8 @@
     .view-switcher { 
       display: flex; 
       background: var(--bg-input); 
-      padding: 4px; 
-      border-radius: 12px; 
+      padding: 3px; 
+      border-radius: 10px; 
       border: 1px solid var(--border-color); 
       gap: 4px; 
       width: 100%; 
@@ -157,9 +162,9 @@
       background: transparent; 
       color: var(--text-muted); 
       border: none; 
-      padding: 8px 6px; 
+      padding: 6px 4px; 
       border-radius: 8px; 
-      font-size: 13px; 
+      font-size: 12px; 
       font-weight: 600; 
       cursor: pointer; 
       text-align: center; 
@@ -200,7 +205,7 @@
     }
 
     .chat-panel { 
-      padding: 14px; 
+      padding: 12px; 
       gap: 10px; 
       height: 100%; 
       background: var(--bg-panel); 
@@ -217,7 +222,7 @@
 
     .secret-input { 
       flex: 1;
-      padding: 10px 14px; 
+      padding: 10px 12px; 
       background: var(--bg-input); 
       border: 1px solid var(--border-color); 
       color: var(--text-main); 
@@ -245,8 +250,8 @@
     .msg { 
       padding: 10px 14px; 
       border-radius: 14px; 
-      font-size: 13.5px; 
-      max-width: 85%; 
+      font-size: 13px; 
+      max-width: 88%; 
       word-break: break-word; 
       line-height: 1.5; 
       animation: fadeIn 0.3s ease;
@@ -288,20 +293,20 @@
     .input-area { 
       display: flex; 
       gap: 8px; 
-      padding-top: 6px;
-      padding-bottom: 4px;
+      padding-top: 4px;
+      padding-bottom: 2px;
       flex-shrink: 0;
     }
 
     .prompt-input { 
       flex: 1; 
-      padding: 12px 14px; 
+      padding: 11px 12px; 
       background: var(--bg-input); 
       border: 1px solid var(--border-color); 
       color: var(--text-main); 
       border-radius: 12px; 
       outline: none; 
-      font-size: 13.5px; 
+      font-size: 13px; 
     }
 
     .prompt-input:focus {
@@ -313,11 +318,11 @@
       background: var(--accent-grad); 
       color: #fff; 
       border: none; 
-      padding: 0 18px; 
+      padding: 0 16px; 
       font-weight: 600; 
       border-radius: 12px; 
       cursor: pointer; 
-      font-size: 13.5px; 
+      font-size: 13px; 
       white-space: nowrap;
       box-shadow: var(--shadow-glow);
     }
@@ -344,7 +349,7 @@
       font-family: 'Fira Code', monospace, Consolas; 
       resize: none; 
       outline: none; 
-      font-size: 12.5px; 
+      font-size: 12px; 
       line-height: 1.6; 
     }
   </style>
@@ -356,7 +361,7 @@
       <div class="top-bar">
         <div class="header-actions">
           <button class="btn-download" id="dlBtn">📦 <span id="dlTxt">ZIP</span></button>
-          <button class="btn-tool" id="shareBtn" onclick="shareProject()">🔗 <span id="shareTxt">مشاركة</span></button>
+          <button class="btn-tool" id="copyCodeBtn" onclick="copyCodeToClipboard()">📋 <span id="copyTxt">نسخ الكود</span></button>
           <button class="btn-tool" id="langToggleBtn" onclick="toggleAppLang()">🌐 EN</button>
           <button class="btn-tool" id="themeToggleBtn" onclick="toggleAppTheme()"></button>
         </div>
@@ -468,7 +473,7 @@
 
       document.getElementById('langToggleBtn').innerText = isEn ? '🌐 AR' : '🌐 EN';
       document.getElementById('dlTxt').innerText = 'ZIP';
-      document.getElementById('shareTxt').innerText = isEn ? 'Share' : 'مشاركة';
+      document.getElementById('copyTxt').innerText = isEn ? 'Copy' : 'نسخ الكود';
       document.getElementById('chatTxt').innerText = isEn ? 'Chat' : 'الشات';
       document.getElementById('prevTxt').innerText = isEn ? 'Preview' : 'المعاينة';
       document.getElementById('codeTxt').innerText = isEn ? 'Code' : 'الكود';
@@ -616,30 +621,12 @@ Rules:
       });
     });
 
-    async function shareProject() {
-      const code = document.getElementById('codeArea').value;
-      if (navigator.share) {
-        try {
-          const file = new File([code], "index.html", { type: "text/html" });
-          await navigator.share({
-            title: 'Jawad Builder Project',
-            text: 'مشروعي المصمم عبر Jawad Builder 🚀',
-            files: [file]
-          });
-        } catch (err) {
-          copyCodeToClipboard();
-        }
-      } else {
-        copyCodeToClipboard();
-      }
-    }
-
     function copyCodeToClipboard() {
       const code = document.getElementById('codeArea').value;
       navigator.clipboard.writeText(code).then(() => {
-        alert(appLang === 'en' ? 'Code copied to clipboard!' : 'تم نسخ الكود إلى الحافظة!');
+        alert(appLang === 'en' ? 'Code copied to clipboard!' : 'تم نسخ الكود إلى الحافظة بنجاح!');
       }).catch(() => {
-        alert(appLang === 'en' ? 'Sharing failed.' : 'تعذر المشاركة.');
+        alert(appLang === 'en' ? 'Failed to copy.' : 'تعذر نسخ الكود.');
       });
     }
 
