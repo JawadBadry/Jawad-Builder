@@ -387,7 +387,7 @@
       </div>
 
       <div id="previewView" class="view-panel">
-        <iframe id="previewFrame" class="preview-frame" sandbox="allow-scripts allow-modals allow-forms"></iframe>
+        <iframe id="previewFrame" class="preview-frame" sandbox="allow-scripts allow-modals allow-forms allow-same-origin"></iframe>
       </div>
 
       <div id="codeView" class="view-panel">
@@ -398,6 +398,7 @@
 
   <script>
     let appLang = 'ar';
+    let currentBlobUrl = null;
 
     function setRealHeight() {
       const vh = window.innerHeight;
@@ -488,17 +489,13 @@
       const code = document.getElementById('codeArea').value;
       const previewFrame = document.getElementById('previewFrame');
       
-      previewFrame.srcdoc = code;
-      
-      try {
-        if (previewFrame.contentDocument) {
-          previewFrame.contentDocument.open();
-          previewFrame.contentDocument.write(code);
-          previewFrame.contentDocument.close();
-        }
-      } catch (e) {
-        console.log("Preview handled via srcdoc");
+      if (currentBlobUrl) {
+        URL.revokeObjectURL(currentBlobUrl);
       }
+
+      const blob = new Blob([code], { type: 'text/html;charset=utf-8' });
+      currentBlobUrl = URL.createObjectURL(blob);
+      previewFrame.src = currentBlobUrl;
     }
 
     document.getElementById('codeArea').addEventListener('input', updatePreview);
@@ -646,7 +643,7 @@ Rules:
       });
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('load', () => {
       updateLanguageUI();
       updatePreview();
     });
