@@ -360,7 +360,7 @@
     <header>
       <div class="top-bar">
         <div class="header-actions">
-          <button class="btn-download" id="dlBtn">📦 <span id="dlTxt">ZIP</span></button>
+          <button class="btn-download" id="dlBtn">📦 <span id="dlTxt">تحميل الملف</span></button>
           <button class="btn-tool" id="copyCodeBtn" onclick="copyCodeToClipboard()">📋 <span id="copyTxt">نسخ الكود</span></button>
           <button class="btn-tool" id="langToggleBtn" onclick="toggleAppLang()">🌐 EN</button>
           <button class="btn-tool" id="themeToggleBtn" onclick="toggleAppTheme()"></button>
@@ -472,7 +472,7 @@
       document.body.classList.toggle('en-mode', isEn);
 
       document.getElementById('langToggleBtn').innerText = isEn ? '🌐 AR' : '🌐 EN';
-      document.getElementById('dlTxt').innerText = 'ZIP';
+      document.getElementById('dlTxt').innerText = isEn ? 'Download ZIP' : 'تحميل الملف';
       document.getElementById('copyTxt').innerText = isEn ? 'Copy' : 'نسخ الكود';
       document.getElementById('chatTxt').innerText = isEn ? 'Chat' : 'الشات';
       document.getElementById('prevTxt').innerText = isEn ? 'Preview' : 'المعاينة';
