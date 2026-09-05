@@ -96,7 +96,6 @@
       gap: 4px; 
     } 
     
-    /* توحيد مقاسات جميع الأزرار العلوية بنفس الأبعاد */
     .btn-tool, .btn-download { 
       background: var(--bg-input); 
       color: var(--text-main); 
@@ -453,9 +452,8 @@
       addMessage(appLang === 'en' ? 'Generating website code...' : 'جاري توليد كود الموقع...', 'ai-msg');
 
       try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${secretKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${secretKey}`;
 
-        // تعليمات تحسين الكود الممررة إلى النموذج
         const systemInstruction = `You are a world-class senior frontend developer and UI/UX designer.
 Your task is to generate a PERFECT, FULLY FUNCTIONAL, BEAUTIFUL, and RESPONSIVE single-file HTML document (with embeded CSS and JS) matching the user's request.
 
