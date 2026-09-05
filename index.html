@@ -11,7 +11,7 @@
       --bg-panel: #151c28;
       --bg-input: #1e2738;
       --border-color: #2a364f;
-      --accent-color: #f97316; /* لون برتقالي مميز لـ Groq */
+      --accent-color: #f97316;
       --accent-hover: #ea580c;
       --text-main: #f3f4f6;
       --text-muted: #9ca3af;
@@ -470,7 +470,7 @@ Rules:
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
+            model: "llama-3.1-8b-instant",
             messages: [
               { role: "system", content: systemInstruction },
               { role: "user", content: prompt }
