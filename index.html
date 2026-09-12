@@ -237,6 +237,24 @@
       box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
     }
 
+    .btn-save-key {
+      background: var(--accent-grad);
+      color: #fff;
+      border: none;
+      padding: 0 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      box-shadow: var(--shadow-glow);
+    }
+
+    .btn-save-key:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
     .chat-box { 
       flex: 1; 
       overflow-y: auto; 
@@ -379,6 +397,7 @@
       <div id="chatView" class="view-panel chat-panel active">
         <div class="secret-container">
           <input type="text" id="secretKey" class="secret-input" placeholder="كلمة السر..." autocomplete="off">
+          <button class="btn-save-key" id="saveKeyBtn" onclick="saveSecretKey()"><span id="saveTxt">حفظ</span> 💾</button>
         </div>
         
         <div class="chat-box" id="chatBox">
@@ -412,6 +431,24 @@
     window.addEventListener('resize', setRealHeight);
     window.addEventListener('orientationchange', setRealHeight);
     setRealHeight();
+
+    function saveSecretKey() {
+      const key = document.getElementById('secretKey').value.trim();
+      if (key) {
+        localStorage.setItem('jawad_builder_key', key);
+        alert(appLang === 'en' ? 'Password saved successfully!' : 'تم حفظ كلمة السر بنجاح!');
+      } else {
+        localStorage.removeItem('jawad_builder_key');
+        alert(appLang === 'en' ? 'Password cleared!' : 'تم مسح كلمة السر!');
+      }
+    }
+
+    function loadSavedSecretKey() {
+      const savedKey = localStorage.getItem('jawad_builder_key');
+      if (savedKey) {
+        document.getElementById('secretKey').value = savedKey;
+      }
+    }
 
     const defaultHTML = `<!DOCTYPE html>
 <html lang="ar">
@@ -478,6 +515,7 @@
       document.getElementById('prevTxt').innerText = isEn ? 'Preview' : 'المعاينة';
       document.getElementById('codeTxt').innerText = isEn ? 'Code' : 'الكود';
       document.getElementById('secretKey').placeholder = isEn ? 'Password...' : 'كلمة السر...';
+      document.getElementById('saveTxt').innerText = isEn ? 'Save' : 'حفظ';
       document.getElementById('welcomeMsg').innerText = isEn ? 'Hello Jawad! Type your idea here to generate your site.' : 'مرحباً جواد! اكتب فكرتك هنا وسأقوم ببناء موقعك الاحترافي بسلاسة وسرعة فائقة.';
       document.getElementById('userInput').placeholder = isEn ? 'Ask to build a website...' : 'اطلب تصميم موقع...';
       document.getElementById('sendBtn').innerText = isEn ? 'Send' : 'إرسال';
@@ -619,7 +657,7 @@ Rules:
         a.download = "jawad-project.zip";
         a.click();
       });
-    });
+    }
 
     function copyCodeToClipboard() {
       const code = document.getElementById('codeArea').value;
@@ -631,6 +669,7 @@ Rules:
     }
 
     window.addEventListener('load', () => {
+      loadSavedSecretKey();
       updateLanguageUI();
       updatePreview();
     });
