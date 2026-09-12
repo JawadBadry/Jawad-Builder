@@ -469,7 +469,7 @@
           <button class="btn-tool" id="copyCodeBtn" onclick="copyCodeToClipboard()">📋 <span id="copyTxt">نسخ الكود</span></button>
           <button class="btn-tool" id="passwordMenuBtn" onclick="openPasswordModal()">🔑 <span id="passMenuTxt">كلمة السر</span></button>
           <button class="btn-tool" id="langToggleBtn" onclick="toggleAppLang()">🌐 EN</button>
-          <button class="btn-tool" id="themeToggleBtn" onclick="toggleAppTheme()">☀️ <span id="themeTxt">صباحي</span></button>
+          <button class="btn-tool" id="themeToggleBtn" onclick="toggleAppTheme()"></button>
         </div>
         <div class="logo">🚀 Jawad Builder</div>
       </div>
@@ -541,10 +541,8 @@
       const key = document.getElementById('secretKey').value.trim();
       if (key) {
         localStorage.setItem('jawad_builder_key', key);
-        alert(appLang === 'en' ? 'Password saved successfully!' : 'تم حفظ كلمة السر بنجاح!');
       } else {
         localStorage.removeItem('jawad_builder_key');
-        alert(appLang === 'en' ? 'Password cleared!' : 'تم مسح كلمة السر!');
       }
       closePasswordModal();
     }
@@ -680,7 +678,6 @@
       
       if (!prompt) return;
       if (!secretKey) {
-        alert(appLang === 'en' ? 'Please enter the Password first!' : 'يرجى إدخال كلمة السر أولاً!');
         openPasswordModal();
         return;
       }
@@ -771,13 +768,14 @@ Rules:
     });
 
     function copyCodeToClipboard() {
-      const codeArea = document.getElementById('codeArea');
-      codeArea.select();
-      codeArea.setSelectionRange(0, 99999);
-      navigator.clipboard.writeText(codeArea.value).then(() => {
-        alert(appLang === 'en' ? 'Code copied to clipboard!' : 'تم نسخ الكود بنجاح!');
-      }).catch(err => {
-        alert(appLang === 'en' ? 'Failed to copy.' : 'فشل النسخ.');
+      const code = document.getElementById('codeArea').value;
+      navigator.clipboard.writeText(code).then(() => {
+        const copyBtn = document.getElementById('copyCodeBtn');
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = appLang === 'en' ? '✓ Copied' : '✓ تم النسخ';
+        setTimeout(() => {
+          copyBtn.innerHTML = originalText;
+        }, 1500);
       });
     }
 
