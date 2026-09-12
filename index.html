@@ -213,23 +213,26 @@
       flex-direction: column;
     }
 
+    /* تحسين إطار كلمة السر للحماية من الالتصاق بالكامل */
     .secret-container {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       width: 100%;
       flex-shrink: 0;
       align-items: center;
+      padding: 2px 0;
     }
 
     .secret-input { 
       flex: 1;
-      padding: 10px 12px; 
+      min-width: 0;
+      padding: 8px 10px; 
       background: var(--bg-input); 
       border: 1px solid var(--border-color); 
       color: var(--text-main); 
       border-radius: 10px; 
       outline: none; 
-      font-size: 13px; 
+      font-size: 12px; 
     } 
 
     .secret-input:focus {
@@ -241,23 +244,24 @@
       background: var(--accent-grad);
       color: #fff;
       border: none;
-      padding: 0 14px;
-      height: 38px;
+      padding: 0 10px;
+      height: 36px;
       border-radius: 10px;
       cursor: pointer;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       white-space: nowrap;
       box-shadow: var(--shadow-glow);
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
 
     .btn-toggle-eye {
       background: var(--bg-input);
       border: 1px solid var(--border-color);
-      padding: 0 10px;
+      padding: 0 8px;
       box-shadow: none;
     }
 
@@ -408,7 +412,7 @@
         <div class="secret-container">
           <input type="password" id="secretKey" class="secret-input" placeholder="كلمة السر..." autocomplete="off">
           <button class="btn-toggle-eye" id="toggleEyeBtn" onclick="togglePasswordVisibility()" title="إظهار/إخفاء كلمة السر">👁️</button>
-          <button class="btn-save-key" id="saveKeyBtn" onclick="saveSecretKey()"><span id="saveTxt">حفظ كلمه السر</span> 💾</button>
+          <button class="btn-save-key" id="saveKeyBtn" onclick="saveSecretKey()"><span id="saveTxt">حفظ الكلمة</span> 💾</button>
         </div>
         
         <div class="chat-box" id="chatBox">
@@ -538,7 +542,7 @@
       document.getElementById('prevTxt').innerText = isEn ? 'Preview' : 'المعاينة';
       document.getElementById('codeTxt').innerText = isEn ? 'Code' : 'الكود';
       document.getElementById('secretKey').placeholder = isEn ? 'Password...' : 'كلمة السر...';
-      document.getElementById('saveTxt').innerText = isEn ? 'Save password' : 'حفظ كلمه السر';
+      document.getElementById('saveTxt').innerText = isEn ? 'Save password' : 'حفظ الكلمة';
       document.getElementById('welcomeMsg').innerText = isEn ? 'Hello Jawad! Type your idea here to generate your site.' : 'مرحباً جواد! اكتب فكرتك هنا وسأقوم ببناء موقعك الاحترافي بسلاسة وسرعة فائقة.';
       document.getElementById('userInput').placeholder = isEn ? 'Ask to build a website...' : 'اطلب تصميم موقع...';
       document.getElementById('sendBtn').innerText = isEn ? 'Send' : 'إرسال';
