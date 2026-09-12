@@ -521,6 +521,7 @@
       document.getElementById('sendBtn').innerText = isEn ? 'Send' : 'إرسال';
 
       updateThemeButtonText();
+      loadSavedSecretKey(); // إصلاح الخلل: إعادة تحميل القيمة من الحافظة دائماً
     }
 
     function toggleAppLang() {
@@ -657,7 +658,7 @@ Rules:
         a.download = "jawad-project.zip";
         a.click();
       });
-    }
+    });
 
     function copyCodeToClipboard() {
       const code = document.getElementById('codeArea').value;
