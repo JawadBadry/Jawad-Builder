@@ -147,6 +147,120 @@
       transform: translateY(-1px);
     }
 
+    /* Modal / Dropdown Styles for Password Menu */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 360px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      animation: modalScale 0.2s ease;
+    }
+
+    @keyframes modalScale {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .secret-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .secret-input {
+      flex: 1;
+      padding: 10px 12px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      border-radius: 10px;
+      outline: none;
+      font-size: 13px;
+    }
+
+    .secret-input:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+
+    .btn-toggle-eye {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0 10px;
+      height: 38px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .btn-modal-save, .btn-modal-cancel {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      text-align: center;
+    }
+
+    .btn-modal-save {
+      background: var(--accent-grad);
+      color: #fff;
+      box-shadow: var(--shadow-glow);
+    }
+
+    .btn-modal-cancel {
+      background: var(--bg-input);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+    }
+
     .view-switcher { 
       display: flex; 
       background: var(--bg-input); 
@@ -211,62 +325,6 @@
       background: var(--bg-panel); 
       display: flex;
       flex-direction: column;
-    }
-
-    /* تحسين إطار كلمة السر للحماية من الالتصاق بالكامل */
-    .secret-container {
-      display: flex;
-      gap: 6px;
-      width: 100%;
-      flex-shrink: 0;
-      align-items: center;
-      padding: 2px 0;
-    }
-
-    .secret-input { 
-      flex: 1;
-      min-width: 0;
-      padding: 8px 10px; 
-      background: var(--bg-input); 
-      border: 1px solid var(--border-color); 
-      color: var(--text-main); 
-      border-radius: 10px; 
-      outline: none; 
-      font-size: 12px; 
-    } 
-
-    .secret-input:focus {
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-    }
-
-    .btn-save-key, .btn-toggle-eye {
-      background: var(--accent-grad);
-      color: #fff;
-      border: none;
-      padding: 0 10px;
-      height: 36px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-      white-space: nowrap;
-      box-shadow: var(--shadow-glow);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .btn-toggle-eye {
-      background: var(--bg-input);
-      border: 1px solid var(--border-color);
-      padding: 0 8px;
-      box-shadow: none;
-    }
-
-    .btn-save-key:hover, .btn-toggle-eye:hover {
-      transform: translateY(-1px);
     }
 
     .chat-box { 
@@ -388,12 +446,28 @@
 </head>
 <body>
 
+  <!-- Modal / Password Menu Overlay -->
+  <div class="modal-overlay" id="passwordModal">
+    <div class="modal-content">
+      <div class="modal-title" id="modalTitleText">🔑 إدارة كلمة السر</div>
+      <div class="secret-row">
+        <input type="text" id="secretKey" class="secret-input" placeholder="كلمة السر..." autocomplete="off">
+        <button class="btn-toggle-eye" id="toggleMaskBtn" onclick="togglePasswordMask()" title="إخفاء/إظهار">🔒</button>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" id="cancelModalBtn" onclick="closePasswordModal()">إلغاء</button>
+        <button class="btn-modal-save" id="saveModalBtn" onclick="saveSecretKey()">حفظ كلمة السر</button>
+      </div>
+    </div>
+  </div>
+
   <div id="app-container">
     <header>
       <div class="top-bar">
         <div class="header-actions">
           <button class="btn-download" id="dlBtn">📦 <span id="dlTxt">تحميل الملف</span></button>
           <button class="btn-tool" id="copyCodeBtn" onclick="copyCodeToClipboard()">📋 <span id="copyTxt">نسخ الكود</span></button>
+          <button class="btn-tool" id="passwordMenuBtn" onclick="openPasswordModal()">🔑 <span id="passMenuTxt">كلمة السر</span></button>
           <button class="btn-tool" id="langToggleBtn" onclick="toggleAppLang()">🌐 EN</button>
           <button class="btn-tool" id="themeToggleBtn" onclick="toggleAppTheme()"></button>
         </div>
@@ -409,12 +483,6 @@
 
     <main>
       <div id="chatView" class="view-panel chat-panel active">
-        <div class="secret-container">
-          <input type="password" id="secretKey" class="secret-input" placeholder="كلمة السر..." autocomplete="off">
-          <button class="btn-toggle-eye" id="toggleEyeBtn" onclick="togglePasswordVisibility()" title="إظهار/إخفاء كلمة السر">👁️</button>
-          <button class="btn-save-key" id="saveKeyBtn" onclick="saveSecretKey()"><span id="saveTxt">حفظ الكلمة</span> 💾</button>
-        </div>
-        
         <div class="chat-box" id="chatBox">
           <div class="msg ai-msg" id="welcomeMsg">مرحباً جواد! اكتب فكرتك هنا وسأقوم ببناء موقعك الاحترافي بسلاسة وسرعة فائقة.</div>
         </div>
@@ -438,6 +506,7 @@
   <script>
     let appLang = 'ar';
     let currentBlobUrl = null;
+    let isPasswordMasked = false; // افتراضياً النص ظاهر لأن الحقل text
 
     function setRealHeight() {
       const vh = window.innerHeight;
@@ -447,15 +516,24 @@
     window.addEventListener('orientationchange', setRealHeight);
     setRealHeight();
 
-    function togglePasswordVisibility() {
+    function openPasswordModal() {
+      document.getElementById('passwordModal').classList.add('active');
+    }
+
+    function closePasswordModal() {
+      document.getElementById('passwordModal').classList.remove('active');
+    }
+
+    function togglePasswordMask() {
       const keyInput = document.getElementById('secretKey');
-      const eyeBtn = document.getElementById('toggleEyeBtn');
-      if (keyInput.type === 'password') {
-        keyInput.type = 'text';
-        eyeBtn.innerText = '🙈';
+      const maskBtn = document.getElementById('toggleMaskBtn');
+      isPasswordMasked = !isPasswordMasked;
+      if (isPasswordMasked) {
+        keyInput.style.webkitTextSecurity = 'disc';
+        maskBtn.innerText = '👁️';
       } else {
-        keyInput.type = 'password';
-        eyeBtn.innerText = '👁️';
+        keyInput.style.webkitTextSecurity = 'none';
+        maskBtn.innerText = '🔒';
       }
     }
 
@@ -468,6 +546,7 @@
         localStorage.removeItem('jawad_builder_key');
         alert(appLang === 'en' ? 'Password cleared!' : 'تم مسح كلمة السر!');
       }
+      closePasswordModal();
     }
 
     function loadSavedSecretKey() {
@@ -538,11 +617,14 @@
       document.getElementById('langToggleBtn').innerText = isEn ? '🌐 AR' : '🌐 EN';
       document.getElementById('dlTxt').innerText = isEn ? 'Download ZIP' : 'تحميل الملف';
       document.getElementById('copyTxt').innerText = isEn ? 'Copy' : 'نسخ الكود';
+      document.getElementById('passMenuTxt').innerText = isEn ? 'Password' : 'كلمة السر';
       document.getElementById('chatTxt').innerText = isEn ? 'Chat' : 'الشات';
       document.getElementById('prevTxt').innerText = isEn ? 'Preview' : 'المعاينة';
       document.getElementById('codeTxt').innerText = isEn ? 'Code' : 'الكود';
+      document.getElementById('modalTitleText').innerText = isEn ? '🔑 Password Settings' : '🔑 إدارة كلمة السر';
       document.getElementById('secretKey').placeholder = isEn ? 'Password...' : 'كلمة السر...';
-      document.getElementById('saveTxt').innerText = isEn ? 'Save password' : 'حفظ الكلمة';
+      document.getElementById('cancelModalBtn').innerText = isEn ? 'Cancel' : 'إلغاء';
+      document.getElementById('saveModalBtn').innerText = isEn ? 'Save password' : 'حفظ كلمة السر';
       document.getElementById('welcomeMsg').innerText = isEn ? 'Hello Jawad! Type your idea here to generate your site.' : 'مرحباً جواد! اكتب فكرتك هنا وسأقوم ببناء موقعك الاحترافي بسلاسة وسرعة فائقة.';
       document.getElementById('userInput').placeholder = isEn ? 'Ask to build a website...' : 'اطلب تصميم موقع...';
       document.getElementById('sendBtn').innerText = isEn ? 'Send' : 'إرسال';
@@ -599,6 +681,7 @@
       if (!prompt) return;
       if (!secretKey) {
         alert(appLang === 'en' ? 'Please enter the Password first!' : 'يرجى إدخال كلمة السر أولاً!');
+        openPasswordModal();
         return;
       }
 
@@ -688,19 +771,4 @@ Rules:
     });
 
     function copyCodeToClipboard() {
-      const code = document.getElementById('codeArea').value;
-      navigator.clipboard.writeText(code).then(() => {
-        alert(appLang === 'en' ? 'Code copied to clipboard!' : 'تم نسخ الكود إلى الحافظة بنجاح!');
-      }).catch(() => {
-        alert(appLang === 'en' ? 'Failed to copy.' : 'تعذر نسخ الكود.');
-      });
-    }
-
-    window.addEventListener('load', () => {
-      loadSavedSecretKey();
-      updateLanguageUI();
-      updatePreview();
-    });
-  </script>
-</body>
-</html>
+      const code = document.getElementById('codeArea'
