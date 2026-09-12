@@ -408,7 +408,7 @@
         <div class="secret-container">
           <input type="password" id="secretKey" class="secret-input" placeholder="كلمة السر..." autocomplete="off">
           <button class="btn-toggle-eye" id="toggleEyeBtn" onclick="togglePasswordVisibility()" title="إظهار/إخفاء كلمة السر">👁️</button>
-          <button class="btn-save-key" id="saveKeyBtn" onclick="saveSecretKey()"><span id="saveTxt">حفظ</span> 💾</button>
+          <button class="btn-save-key" id="saveKeyBtn" onclick="saveSecretKey()"><span id="saveTxt">حفظ كلمه السر</span> 💾</button>
         </div>
         
         <div class="chat-box" id="chatBox">
@@ -538,7 +538,7 @@
       document.getElementById('prevTxt').innerText = isEn ? 'Preview' : 'المعاينة';
       document.getElementById('codeTxt').innerText = isEn ? 'Code' : 'الكود';
       document.getElementById('secretKey').placeholder = isEn ? 'Password...' : 'كلمة السر...';
-      document.getElementById('saveTxt').innerText = isEn ? 'Save' : 'حفظ';
+      document.getElementById('saveTxt').innerText = isEn ? 'Save password' : 'حفظ كلمه السر';
       document.getElementById('welcomeMsg').innerText = isEn ? 'Hello Jawad! Type your idea here to generate your site.' : 'مرحباً جواد! اكتب فكرتك هنا وسأقوم ببناء موقعك الاحترافي بسلاسة وسرعة فائقة.';
       document.getElementById('userInput').placeholder = isEn ? 'Ask to build a website...' : 'اطلب تصميم موقع...';
       document.getElementById('sendBtn').innerText = isEn ? 'Send' : 'إرسال';
