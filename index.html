@@ -469,7 +469,7 @@
           <button class="btn-tool" id="copyCodeBtn" onclick="copyCodeToClipboard()">📋 <span id="copyTxt">نسخ الكود</span></button>
           <button class="btn-tool" id="passwordMenuBtn" onclick="openPasswordModal()">🔑 <span id="passMenuTxt">كلمة السر</span></button>
           <button class="btn-tool" id="langToggleBtn" onclick="toggleAppLang()">🌐 EN</button>
-          <button class="btn-tool" id="themeToggleBtn" onclick="toggleAppTheme()"></button>
+          <button class="btn-tool" id="themeToggleBtn" onclick="toggleAppTheme()">☀️ <span id="themeTxt">صباحي</span></button>
         </div>
         <div class="logo">🚀 Jawad Builder</div>
       </div>
@@ -506,7 +506,7 @@
   <script>
     let appLang = 'ar';
     let currentBlobUrl = null;
-    let isPasswordMasked = false; // افتراضياً النص ظاهر لأن الحقل text
+    let isPasswordMasked = false;
 
     function setRealHeight() {
       const vh = window.innerHeight;
@@ -771,4 +771,18 @@ Rules:
     });
 
     function copyCodeToClipboard() {
-      const code = document.getElementById('codeArea'
+      const codeArea = document.getElementById('codeArea');
+      codeArea.select();
+      codeArea.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(codeArea.value).then(() => {
+        alert(appLang === 'en' ? 'Code copied to clipboard!' : 'تم نسخ الكود بنجاح!');
+      }).catch(err => {
+        alert(appLang === 'en' ? 'Failed to copy.' : 'فشل النسخ.');
+      });
+    }
+
+    loadSavedSecretKey();
+    updateThemeButtonText();
+  </script>
+</body>
+</html>
