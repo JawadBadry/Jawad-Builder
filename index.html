@@ -218,6 +218,7 @@
       gap: 8px;
       width: 100%;
       flex-shrink: 0;
+      align-items: center;
     }
 
     .secret-input { 
@@ -229,7 +230,6 @@
       border-radius: 10px; 
       outline: none; 
       font-size: 13px; 
-      -webkit-text-security: disc; 
     } 
 
     .secret-input:focus {
@@ -237,21 +237,31 @@
       box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
     }
 
-    .btn-save-key {
+    .btn-save-key, .btn-toggle-eye {
       background: var(--accent-grad);
       color: #fff;
       border: none;
       padding: 0 14px;
+      height: 38px;
       border-radius: 10px;
       cursor: pointer;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 600;
       white-space: nowrap;
       box-shadow: var(--shadow-glow);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .btn-save-key:hover {
-      background: var(--accent-hover);
+    .btn-toggle-eye {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      padding: 0 10px;
+      box-shadow: none;
+    }
+
+    .btn-save-key:hover, .btn-toggle-eye:hover {
       transform: translateY(-1px);
     }
 
@@ -396,7 +406,8 @@
     <main>
       <div id="chatView" class="view-panel chat-panel active">
         <div class="secret-container">
-          <input type="text" id="secretKey" class="secret-input" placeholder="كلمة السر..." autocomplete="off">
+          <input type="password" id="secretKey" class="secret-input" placeholder="كلمة السر..." autocomplete="off">
+          <button class="btn-toggle-eye" id="toggleEyeBtn" onclick="togglePasswordVisibility()" title="إظهار/إخفاء كلمة السر">👁️</button>
           <button class="btn-save-key" id="saveKeyBtn" onclick="saveSecretKey()"><span id="saveTxt">حفظ</span> 💾</button>
         </div>
         
@@ -431,6 +442,18 @@
     window.addEventListener('resize', setRealHeight);
     window.addEventListener('orientationchange', setRealHeight);
     setRealHeight();
+
+    function togglePasswordVisibility() {
+      const keyInput = document.getElementById('secretKey');
+      const eyeBtn = document.getElementById('toggleEyeBtn');
+      if (keyInput.type === 'password') {
+        keyInput.type = 'text';
+        eyeBtn.innerText = '🙈';
+      } else {
+        keyInput.type = 'password';
+        eyeBtn.innerText = '👁️';
+      }
+    }
 
     function saveSecretKey() {
       const key = document.getElementById('secretKey').value.trim();
@@ -521,7 +544,7 @@
       document.getElementById('sendBtn').innerText = isEn ? 'Send' : 'إرسال';
 
       updateThemeButtonText();
-      loadSavedSecretKey(); // إصلاح الخلل: إعادة تحميل القيمة من الحافظة دائماً
+      loadSavedSecretKey();
     }
 
     function toggleAppLang() {
